@@ -1,0 +1,286 @@
+#!/usr/bin/env python3
+
+import json
+import re
+import shutil
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+AGENTS_MANIFEST_PATH = ROOT / "config" / "agents.json"
+LEGACY_CONFIG_PATH = ROOT / "config" / "custom-agent.json"
+LEGACY_PROMPT_PATH = ROOT / "prompts" / "custom-agent.md"
+LOCAL_TOOLS_DIR = ROOT / ".opencode" / "tools"
+OPENCODE_DIR = Path.home() / ".config" / "opencode"
+AGENTS_DIR = OPENCODE_DIR / "agents"
+TOOLS_DIR = OPENCODE_DIR / "tools"
+OPENCODE_CONFIG_PATH = OPENCODE_DIR / "opencode.json"
+
+
+def load_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8").strip() + "\n"
+
+
+def strip_jsonc(text: str) -> str:
+    result = []
+    in_string = False
+    string_char = ""
+    escape = False
+    i = 0
+
+    while i < len(text):
+        char = text[i]
+        next_char = text[i + 1] if i + 1 < len(text) else ""
+
+        if in_string:
+            result.append(char)
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == string_char:
+                in_string = False
+            i += 1
+            continue
+
+        if char in ('"', "'"):
+            in_string = True
+            string_char = char
+            result.append(char)
+            i += 1
+            continue
+
+        if char == "/" and next_char == "/":
+            i += 2
+            while i < len(text) and text[i] not in "\r\n":
+                i += 1
+            continue
+
+        if char == "/" and next_char == "*":
+            i += 2
+            while i + 1 < len(text) and not (text[i] == "*" and text[i + 1] == "/"):
+                i += 1
+            i += 2
+            continue
+
+        result.append(char)
+        i += 1
+
+    cleaned = "".join(result)
+    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
+    return cleaned
+
+
+def load_json_file(path: Path) -> dict:
+    text = path.read_text(encoding="utf-8")
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads(strip_jsonc(text))
+
+
+def yaml_scalar(value):
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    text = str(value)
+    if re.fullmatch(r"[A-Za-z0-9_./#:-]+", text):
+        return text
+    return json.dumps(text)
+
+
+def append_yaml(lines: list[str], key: str, value, indent: int = 0) -> None:
+    prefix = "  " * indent
+
+    if isinstance(value, dict):
+        lines.append(f"{prefix}{key}:")
+        for child_key, child_value in value.items():
+            append_yaml(lines, str(child_key), child_value, indent + 1)
+        return
+
+    if isinstance(value, list):
+        lines.append(f"{prefix}{key}:")
+        item_prefix = "  " * (indent + 1)
+        for item in value:
+            if isinstance(item, (dict, list)):
+                lines.append(f"{item_prefix}-")
+                if isinstance(item, dict):
+                    for child_key, child_value in item.items():
+                        append_yaml(lines, str(child_key), child_value, indent + 2)
+                else:
+                    for nested in item:
+                        lines.append(f"{item_prefix}  - {yaml_scalar(nested)}")
+            else:
+                lines.append(f"{item_prefix}- {yaml_scalar(item)}")
+        return
+
+    lines.append(f"{prefix}{key}: {yaml_scalar(value)}")
+
+
+def dump_frontmatter(config: dict) -> str:
+    lines = ["---"]
+    ordered_keys = [
+        "description",
+        "mode",
+        "model",
+        "temperature",
+        "top_p",
+        "steps",
+        "color",
+        "hidden",
+    ]
+
+    for key in ordered_keys:
+        if key in config:
+            append_yaml(lines, key, config[key])
+
+    for key in sorted(config):
+        if key in ordered_keys or key == "id" or key == "tools":
+            continue
+        append_yaml(lines, key, config[key])
+
+    tools = config.get("tools")
+    if tools:
+        append_yaml(lines, "tools", tools)
+
+    lines.append("---")
+    return "\n".join(lines) + "\n"
+
+
+def write_agent_markdown(config: dict, prompt_text: str) -> Path:
+    agent_id = config["id"]
+    AGENTS_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = AGENTS_DIR / f"{agent_id}.md"
+    frontmatter = dump_frontmatter(config)
+    output_path.write_text(frontmatter + "\n" + prompt_text, encoding="utf-8")
+    return output_path
+
+
+def load_agent_specs() -> tuple[list[dict], str]:
+    if AGENTS_MANIFEST_PATH.exists():
+        manifest = load_json_file(AGENTS_MANIFEST_PATH)
+        agents = manifest.get("agents")
+
+        if not isinstance(agents, list) or not agents:
+            raise ValueError("config/agents.json must include a non-empty 'agents' list")
+
+        specs = []
+        seen_ids = set()
+
+        for entry in agents:
+            config_file = entry.get("config_file")
+            prompt_file = entry.get("prompt_file")
+            if not config_file or not prompt_file:
+                raise ValueError("Each agent entry must include 'config_file' and 'prompt_file'")
+
+            config_path = Path(config_file).expanduser()
+            prompt_path = Path(prompt_file).expanduser()
+            config = load_json_file(config_path)
+            prompt_text = load_text(prompt_path)
+            agent_id = config.get("id")
+
+            if not agent_id:
+                raise ValueError(f"{config_path} must include an 'id' field")
+            if entry.get("id") and entry["id"] != agent_id:
+                raise ValueError(f"Manifest id '{entry['id']}' does not match config id '{agent_id}'")
+            if not config.get("description"):
+                raise ValueError(f"{config_path} must include a 'description' field")
+            if agent_id in seen_ids:
+                raise ValueError(f"Duplicate agent id '{agent_id}' in config/agents.json")
+
+            seen_ids.add(agent_id)
+            specs.append({"config": config, "prompt_text": prompt_text})
+
+        default_agent = manifest.get("default_agent") or specs[0]["config"]["id"]
+        if default_agent not in seen_ids:
+            raise ValueError("default_agent must match one of the configured agent ids")
+
+        return specs, default_agent
+
+    config = load_json_file(LEGACY_CONFIG_PATH)
+    prompt_text = load_text(LEGACY_PROMPT_PATH)
+
+    if not config.get("id"):
+        raise ValueError("config/custom-agent.json must include an 'id' field")
+    if not config.get("description"):
+        raise ValueError("config/custom-agent.json must include a 'description' field")
+
+    return [{"config": config, "prompt_text": prompt_text}], config["id"]
+
+
+def update_opencode_config(agent_id: str) -> Path:
+    OPENCODE_DIR.mkdir(parents=True, exist_ok=True)
+
+    if OPENCODE_CONFIG_PATH.exists():
+        config = load_json_file(OPENCODE_CONFIG_PATH)
+        backup_path = OPENCODE_CONFIG_PATH.with_suffix(".json.bak")
+        shutil.copy2(OPENCODE_CONFIG_PATH, backup_path)
+    else:
+        config = {"$schema": "https://opencode.ai/config.json"}
+
+    config["default_agent"] = agent_id
+    OPENCODE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    return OPENCODE_CONFIG_PATH
+
+
+def sync_custom_tools() -> list[Path]:
+    if not LOCAL_TOOLS_DIR.exists():
+        return []
+
+    synced_paths = []
+    TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+
+    for source_path in sorted(LOCAL_TOOLS_DIR.rglob("*")):
+        if not source_path.is_file():
+            continue
+
+        relative_path = source_path.relative_to(LOCAL_TOOLS_DIR)
+        destination_path = TOOLS_DIR / relative_path
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_path, destination_path)
+        synced_paths.append(destination_path)
+
+    return synced_paths
+
+
+def main() -> int:
+    try:
+        agent_specs, default_agent = load_agent_specs()
+    except FileNotFoundError as exc:
+        print(f"Missing required file: {exc.filename}", file=sys.stderr)
+        return 1
+    except json.JSONDecodeError as exc:
+        print(f"Could not parse JSON config: {exc}", file=sys.stderr)
+        return 1
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    agent_paths = [
+        write_agent_markdown(spec["config"], spec["prompt_text"])
+        for spec in agent_specs
+    ]
+    tool_paths = sync_custom_tools()
+
+    try:
+        config_path = update_opencode_config(default_agent)
+    except json.JSONDecodeError as exc:
+        print(f"Could not update {OPENCODE_CONFIG_PATH}: {exc}", file=sys.stderr)
+        return 1
+
+    print("Synced agents:")
+    for agent_path in agent_paths:
+        print(f"- {agent_path}")
+    if tool_paths:
+        print("Synced tools:")
+        for tool_path in tool_paths:
+            print(f"- {tool_path}")
+    print(f"Set default_agent to '{default_agent}' in {config_path}")
+    print("Reload OpenCode to pick up the updated agents and tools.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

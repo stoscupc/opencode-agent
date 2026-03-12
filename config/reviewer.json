@@ -1,0 +1,12 @@
+{
+  "id": "reviewer",
+  "description": "Reviews changes for correctness, scope, and alignment with the approved plan.",
+  "mode": "subagent",
+  "temperature": 0.1,
+  "steps": 3,
+  "tools": {
+    "write": false,
+    "edit": false,
+    "bash": true
+  }
+}

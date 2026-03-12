@@ -1,0 +1,7 @@
+{
+  "name": "opencode-agent",
+  "private": true,
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.2.24"
+  }
+}

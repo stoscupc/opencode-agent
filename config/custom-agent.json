@@ -1,0 +1,11 @@
+{
+  "id": "custom-agent",
+  "description": "A concise prompt-first OpenCode assistant for safe repo work.",
+  "mode": "primary",
+  "temperature": 0.2,
+  "tools": {
+    "write": true,
+    "edit": true,
+    "bash": true
+  }
+}

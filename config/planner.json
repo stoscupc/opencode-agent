@@ -1,0 +1,19 @@
+{
+  "id": "planner",
+  "description": "Plans code changes, asks for missing context, then orchestrates implementer/reviewer after approval.",
+  "mode": "primary",
+  "temperature": 0.2,
+  "steps": 8,
+  "tools": {
+    "write": false,
+    "edit": false,
+    "bash": true
+  },
+  "permission": {
+    "task": {
+      "*": "deny",
+      "implementer": "allow",
+      "reviewer": "allow"
+    }
+  }
+}

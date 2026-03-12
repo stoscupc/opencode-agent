@@ -1,0 +1,12 @@
+{
+  "id": "implementer",
+  "description": "Implements an approved plan with minimal, repo-aligned changes.",
+  "mode": "subagent",
+  "temperature": 0.2,
+  "steps": 6,
+  "tools": {
+    "write": true,
+    "edit": true,
+    "bash": true
+  }
+}

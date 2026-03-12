@@ -1,0 +1,20 @@
+{
+  "default_agent": "planner",
+  "agents": [
+    {
+      "id": "planner",
+      "config_file": "/Users/callie.stoscup/opencode-agent/config/planner.json",
+      "prompt_file": "/Users/callie.stoscup/opencode-agent/prompts/planner.md"
+    },
+    {
+      "id": "implementer",
+      "config_file": "/Users/callie.stoscup/opencode-agent/config/implementer.json",
+      "prompt_file": "/Users/callie.stoscup/opencode-agent/prompts/implementer.md"
+    },
+    {
+      "id": "reviewer",
+      "config_file": "/Users/callie.stoscup/opencode-agent/config/reviewer.json",
+      "prompt_file": "/Users/callie.stoscup/opencode-agent/prompts/reviewer.md"
+    }
+  ]
+}
