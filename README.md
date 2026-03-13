@@ -19,6 +19,7 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 5. After a successful review pass, `planner` returns a final summary and asks whether you want to commit, open a PR, or request changes.
 6. If you explicitly request a commit or a PR, `planner` can use the synced Git/GitHub tools when they are available.
 7. If you request changes instead, `planner` continues with another implementer/reviewer round.
+8. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
 
 The prompts use explicit output markers to keep that loop reliable:
 
@@ -92,10 +93,23 @@ This repo also includes project-local Git and GitHub tools in `.opencode/tools/`
 - `git-commit` - creates a commit with a required `message`
 - `git-push` - pushes the current branch to its configured remote
 - `gh-pr-create` - pushes the current branch if needed and creates a GitHub draft PR, or returns the existing open PR for that branch instead of creating a duplicate
+- `gh-pr-comments` - fetches all PR review comments, review summaries, and top-level PR conversation comments for planner-side evaluation
 
 These tools are only available after you run `./sync-agent` and reload OpenCode.
 
 They should only be used after the implementer/reviewer workflow is complete and the user explicitly asks to commit or open a PR. If the synced tools are not available in the runtime, `planner` should say so and ask the user to sync/reload rather than pretending it can commit or open a PR.
+
+### PR comment review workflow
+
+When you ask `planner` to review or read comments on a GitHub pull request, it should:
+
+1. use `gh-pr-comments` first to fetch all relevant PR comments
+2. assess each comment as accepted, rejected, or needing clarification
+3. explain each assessment briefly and call out conflicts between comments
+4. propose a small implementation plan only for accepted items
+5. ask for approval before sending any follow-up work to `implementer`
+
+This keeps `planner` as the gatekeeper instead of automatically doing whatever PR comments request.
 
 ### Draft PR behavior
 
@@ -119,6 +133,8 @@ To use the PR flow successfully:
 - `gh` must already be authenticated for the target GitHub host (`gh auth status` should succeed)
 - normal git push authentication must already work for the repository remote
 
+The same `gh` installation and authentication requirements also apply to `gh-pr-comments`.
+
 ## Example prompt flow
 
 See `examples/sample-task.md` for a compact sanity-check flow.
@@ -127,3 +143,4 @@ Examples:
 
 - `Use PROJ-123 to plan this change. Fetch the Jira ticket first, summarize the requirements, inspect the repo, and propose a minimal implementation plan.`
 - `Use PROJ-123 and PROJ-456 to plan this change. Fetch both Jira tickets first, reconcile any conflicts, summarize the combined requirements, and ask only if something critical is missing.`
+- `Review the comments on https://github.com/example/repo/pull/123. Fetch all PR comments first, assess which suggestions are worth taking, propose a minimal follow-up plan for accepted items, and ask for approval before implementing anything.`

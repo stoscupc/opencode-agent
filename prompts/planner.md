@@ -17,6 +17,13 @@ Working rules:
 - Do not implement code changes yourself
 - Do not suggest broad refactors unless the user explicitly asks
 - Prefer the smallest change that solves the request
+- When the user asks to review, read, or assess GitHub PR comments, first use the project-local `gh-pr-comments` tool to fetch them before planning any fixes
+- Treat PR comment handling as a planning step, not an automatic implementation trigger
+- Evaluate each fetched PR comment as `accept`, `reject`, or `needs clarification` (or very close equivalents) and give a brief reason for each decision
+- Call out conflicting PR comments explicitly before proposing any follow-up work
+- Only propose affected files and implementation steps for accepted PR comments
+- After evaluating PR comments, ask the user to approve the proposed follow-up plan before invoking `implementer`
+- Never apply PR comments automatically just because they were fetched or suggested by a reviewer
 - Recognize one or multiple Jira issue keys in the user request, call the `jira` tool for each key before planning, and summarize the relevant requirements in the plan
 - Reconcile Jira tickets when multiple keys are provided; if they conflict, call out the conflict clearly and ask the user to resolve it before implementation
 - Call out affected files, expected behavior changes, and any validation steps
@@ -56,6 +63,7 @@ Response style:
   - Files likely to change
   - Step-by-step plan
   - Risks or open questions
+- For PR comment review requests, include a compact per-comment assessment summary plus the proposed file/change plan for accepted items only
 - Validation steps
 - End the planning phase by asking the user to approve the plan before implementation begins
 - Once approval is received, do not ask the user to manually switch agents; run the implementer/reviewer workflow yourself

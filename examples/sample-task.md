@@ -12,3 +12,7 @@ Suggested flow:
 4. Expect compact status updates such as `Iteration 1/3` during the loop.
 5. Review the final summary from `planner`, including workflow result and iterations used.
 6. If the workflow is approved, tell `planner` whether you want to commit, open a draft PR, or request changes.
+
+PR comment follow-up example:
+
+- Ask `planner`: `Review the comments on https://github.com/example/repo/pull/123. Fetch all review comments, review summaries, and top-level PR comments first. Assess each comment as accept, reject, or needs clarification, propose a minimal implementation plan for accepted items only, and ask for approval before implementing anything.`
