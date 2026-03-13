@@ -16,8 +16,8 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 2. You approve the plan.
 3. `planner` delegates to `implementer` and `reviewer`.
 4. `implementer` and `reviewer` loop for up to 3 rounds total.
-5. After a successful review pass, `planner` returns a final summary and asks whether you want to commit or request changes.
-6. If you explicitly request a commit, `planner` can use the synced Git tools when they are available.
+5. After a successful review pass, `planner` returns a final summary and asks whether you want to commit, open a PR, or request changes.
+6. If you explicitly request a commit or a PR, `planner` can use the synced Git/GitHub tools when they are available.
 7. If you request changes instead, `planner` continues with another implementer/reviewer round.
 
 The prompts use explicit output markers to keep that loop reliable:
@@ -86,15 +86,38 @@ If you include Jira issue keys in a planning request, `planner` should fetch the
 
 ## Git tools
 
-This repo also includes project-local Git tools in `.opencode/tools/`:
+This repo also includes project-local Git and GitHub tools in `.opencode/tools/`:
 
 - `git-add` - stages current-directory changes with `git add .`
 - `git-commit` - creates a commit with a required `message`
 - `git-push` - pushes the current branch to its configured remote
+- `gh-pr-create` - pushes the current branch if needed and creates a GitHub draft PR, or returns the existing open PR for that branch instead of creating a duplicate
 
 These tools are only available after you run `./sync-agent` and reload OpenCode.
 
-They should only be used after the implementer/reviewer workflow is complete and the user explicitly asks to commit. If the synced tools are not available in the runtime, `planner` should say so and ask the user to sync/reload rather than pretending it can commit.
+They should only be used after the implementer/reviewer workflow is complete and the user explicitly asks to commit or open a PR. If the synced tools are not available in the runtime, `planner` should say so and ask the user to sync/reload rather than pretending it can commit or open a PR.
+
+### Draft PR behavior
+
+`gh-pr-create` is intentionally draft-only. It focuses on opening a draft PR now; a separate ready-for-review tool can be added later.
+
+When `planner` opens a PR, it should first create a commit with `git-add` and `git-commit`, then call `gh-pr-create` only if the user explicitly asked for a PR.
+
+If the current local branch is `main`, `planner` must not push directly to `main`. For commit pushes, it should create or check out `opencode/pr-<short-head-sha>` first. For draft PR creation, `gh-pr-create` applies the same safety rule automatically before pushing.
+
+`gh-pr-create` also:
+
+- generates an automatic draft PR title from the branch commits
+- generates an automatic draft PR body with summary/testing sections
+- checks for an existing open PR for the current branch and returns that PR instead of creating a duplicate
+
+### Authentication requirements
+
+To use the PR flow successfully:
+
+- `gh` must already be installed and available on `PATH`
+- `gh` must already be authenticated for the target GitHub host (`gh auth status` should succeed)
+- normal git push authentication must already work for the repository remote
 
 ## Example prompt flow
 

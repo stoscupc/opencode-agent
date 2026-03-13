@@ -11,3 +11,4 @@ Suggested flow:
 3. Let `planner` orchestrate `implementer` and `reviewer` automatically.
 4. Expect compact status updates such as `Iteration 1/3` during the loop.
 5. Review the final summary from `planner`, including workflow result and iterations used.
+6. If the workflow is approved, tell `planner` whether you want to commit, open a draft PR, or request changes.
