@@ -7,14 +7,14 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 1. Edit the prompts in `prompts/` and agent settings in `config/` as needed.
 2. Run `./sync-agent`.
 3. Reload OpenCode.
-4. Start with `planner` (the current default agent).
-5. Ask `planner` to inspect the repo and propose a plan.
+4. Start with `ops` (the current default agent).
+5. Ask `ops` to decompose your request into Gantry tasks and route implementation/review.
 
 ## Default workflow
 
-1. `planner` inspects the repo and proposes a plan.
-2. You approve the plan.
-3. `planner` delegates to `implementer` and `reviewer`.
+1. `ops` decomposes incoming work into Gantry tasks (for example `impl`, `test`, `review`).
+2. `ops` submits tasks and tracks IDs/status in Gantry.
+3. `ops` delegates implementation/review to `implementer` and `reviewer` for code-bearing tasks.
 4. `implementer` and `reviewer` loop for up to 3 rounds total.
 5. After a successful review pass, `planner` returns a final walkthrough summary and asks a numbered next-step prompt with only one option-2 variant based on PR state:
    - if no PR exists yet for the current work: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and open a PR 3. Request changes`
@@ -44,10 +44,11 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 
 ## Repository layout
 
-- `prompts/planner.md` - plans changes, asks for missing context, and orchestrates the workflow
+- `prompts/ops.md` - decomposes incoming requests into Gantry tasks and orchestrates execution
+- `prompts/planner.md` - planning specialist that can still be used directly when needed
 - `prompts/implementer.md` - implements an approved plan
 - `prompts/reviewer.md` - reviews changes for correctness and scope
-- `config/agents.json` - agent manifest; currently sets `planner` as the default agent
+- `config/agents.json` - agent manifest; currently sets `ops` as the default agent
 - `config/*.json` - per-agent metadata used by the sync script
 - `.opencode/tools/` - project-local custom tools for Jira and Git actions
 - `sync-agent` - installs configured agents and copies project-local tools into your OpenCode config
@@ -66,6 +67,8 @@ The script:
 - updates `default_agent` in `~/.config/opencode/opencode.json`
 
 If `~/.config/opencode/opencode.json` already exists, the script preserves other settings and only updates `default_agent`.
+
+Agent config and prompt paths in `config/agents.json` can be relative (recommended). Relative paths are resolved from this repository root.
 
 After syncing, reload OpenCode so the updated agents and custom tools are available.
 
@@ -99,6 +102,23 @@ Example request:
 - `Use the jira tool to fetch PROJ-123`
 
 If you include Jira issue keys in a planning request, `planner` should fetch them first, summarize the requirements, flag conflicts, ask only when critical details are missing, and pass that Jira context into `implementer` and `reviewer`.
+
+## Gantry tools
+
+This repo includes project-local Gantry task tools in `.opencode/tools/`:
+
+- `gantry-task-create` - creates tasks for a workflow/workstream and target role
+- `gantry-task-list` - lists tasks with role/status/tag filtering
+- `gantry-task-claim` - claims a task by task ID
+- `gantry-task-complete` - completes a task by ID with optional summary/metadata
+
+These tools look for Gantry in this order:
+
+1. `GANTRY_BIN` environment variable
+2. a sibling checkout at `../gantry/bin/gantry` (or any ancestor's `gantry/bin/gantry`)
+3. `gantry` on `PATH`
+
+Use these with the `ops` agent to produce and consume work items in Gantry.
 
 ## Git tools
 

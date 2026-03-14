@@ -66,6 +66,8 @@ If you do not already have NATS+JetStream running:
 just up-nats
 ```
 
+Or if you are not using `just`, start your NATS server manually with JetStream enabled and reachable at `nats://127.0.0.1:4222`.
+
 ## 3) Run Gantry MCP server
 
 Start MCP mode in a dedicated terminal:
@@ -106,8 +108,26 @@ Set `command` to the real absolute path of your local `gantry/bin/gantry`.
 ## 6) Quick verification
 
 - Confirm Gantry process is running in MCP mode.
-- Open OpenCode and start the `planner` agent.
-- Ask the agent to use Gantry tools (for example, list sessions or tasks).
+- Confirm NATS is running; `gantry task list --json` should not return a connection error.
+- Open OpenCode and start the `ops` agent.
+- Ask the agent to use Gantry tools (for example, list tasks, create tasks, claim, complete).
+
+## 7) Ops-agent produce/consume flow
+
+Use this sequence for local work submission:
+
+1. Start NATS.
+2. Start Gantry MCP (`gantry mcp`).
+3. In `opencode-agent`, run `./sync-agent` and reload OpenCode.
+4. Give `ops` a work request and ask it to decompose into Gantry tasks.
+5. `ops` creates tasks for `impl`, `test`, and `review` roles.
+6. Workers (or delegated agents) claim tasks and complete them with summaries.
+
+Example prompt for `ops`:
+
+```text
+Take this request, create a Gantry workflow/workstream, decompose into impl/test/review tasks, submit tasks, and track status until review is complete.
+```
 
 ## Notes
 

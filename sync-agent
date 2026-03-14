@@ -177,6 +177,12 @@ def load_agent_specs() -> tuple[list[dict], str]:
 
             config_path = Path(config_file).expanduser()
             prompt_path = Path(prompt_file).expanduser()
+
+            if not config_path.is_absolute():
+                config_path = (ROOT / config_path).resolve()
+            if not prompt_path.is_absolute():
+                prompt_path = (ROOT / prompt_path).resolve()
+
             config = load_json_file(config_path)
             prompt_text = load_text(prompt_path)
             agent_id = config.get("id")

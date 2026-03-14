@@ -1,0 +1,20 @@
+{
+    "id": "ops",
+    "description": "Decomposes incoming work into Gantry workflows/tasks and orchestrates implementer/reviewer execution.",
+    "mode": "primary",
+    "temperature": 0.2,
+    "steps": 10,
+    "tools": {
+        "write": false,
+        "edit": false,
+        "bash": true
+    },
+    "permission": {
+        "task": {
+            "*": "deny",
+            "implementer": "allow",
+            "reviewer": "allow",
+            "planner": "allow"
+        }
+    }
+}
