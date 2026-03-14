@@ -1,0 +1,93 @@
+# Gantry Setup for OpenCode Agent
+
+This guide wires `opencode-agent` to a local `gantry` checkout so agents can submit and coordinate work through Gantry MCP.
+
+## Repo layout expected
+
+This document assumes both folders are siblings:
+
+- `project_iverson/opencode-agent`
+- `project_iverson/gantry`
+
+## Prerequisites
+
+- Go 1.25+
+- `just`
+- NATS with JetStream enabled
+- OpenCode installed and using `~/.config/opencode/`
+
+## 1) Build Gantry
+
+From the `gantry` repo:
+
+```bash
+cd ../gantry
+just build
+```
+
+This produces:
+
+- `bin/gantry`
+- `bin/sentinel`
+
+Optional install:
+
+```bash
+just install
+```
+
+## 2) Start NATS (if needed)
+
+If you do not already have NATS+JetStream running:
+
+```bash
+just up-nats
+```
+
+## 3) Run Gantry MCP server
+
+Start MCP mode in a dedicated terminal:
+
+```bash
+cd ../gantry
+./bin/gantry mcp
+```
+
+## 4) Sync OpenCode agents/tools from this repo
+
+From `opencode-agent`:
+
+```bash
+cd ../opencode-agent
+./sync-agent
+```
+
+Then reload OpenCode.
+
+## 5) Register Gantry MCP in OpenCode config
+
+Add a Gantry MCP entry in `~/.config/opencode/opencode.json` (shape may vary by OpenCode version):
+
+```json
+{
+  "mcp": {
+    "gantry": {
+      "command": "/absolute/path/to/project_iverson/gantry/bin/gantry",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+Use your real absolute path for `command`.
+
+## 6) Quick verification
+
+- Confirm Gantry process is running in MCP mode.
+- Open OpenCode and start the `planner` agent.
+- Ask the agent to use Gantry tools (for example, list sessions or tasks).
+
+## Notes
+
+- `config/agents.json` currently contains absolute paths from another machine. If `./sync-agent` fails, update `config_file` and `prompt_file` paths to your local checkout paths.
+- Keep Gantry and OpenCode running in separate terminals during active work submission.
