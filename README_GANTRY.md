@@ -4,10 +4,31 @@ This guide wires `opencode-agent` to a local `gantry` checkout so agents can sub
 
 ## Repo layout expected
 
-This document assumes both folders are siblings:
+Assume both repos are sibling directories under the same local parent directory:
 
-- `project_iverson/opencode-agent`
-- `project_iverson/gantry`
+```text
+./opencode-agent
+./gantry
+```
+
+If you are currently in `opencode-agent`, `../gantry` should exist.
+
+## 0) Ensure colocated sibling repos
+
+From the parent directory that contains both repos:
+
+```bash
+pwd
+ls -1
+```
+
+You should see both `opencode-agent` and `gantry` in the output.
+
+If `gantry` is missing, clone it into the same parent directory:
+
+```bash
+git clone <gantry-repo-url> gantry
+```
 
 ## Prerequisites
 
@@ -18,11 +39,12 @@ This document assumes both folders are siblings:
 
 ## 1) Build Gantry
 
-From the `gantry` repo:
+From `opencode-agent`:
 
 ```bash
 cd ../gantry
-just build
+go build -o bin/gantry ./cmd/gantry
+go build -o bin/sentinel ./cmd/sentinel
 ```
 
 This produces:
@@ -30,7 +52,7 @@ This produces:
 - `bin/gantry`
 - `bin/sentinel`
 
-Optional install:
+Optional install (if `just` is available):
 
 ```bash
 just install
@@ -72,14 +94,14 @@ Add a Gantry MCP entry in `~/.config/opencode/opencode.json` (shape may vary by 
 {
   "mcp": {
     "gantry": {
-      "command": "/absolute/path/to/project_iverson/gantry/bin/gantry",
+      "command": "/absolute/path/to/gantry/bin/gantry",
       "args": ["mcp"]
     }
   }
 }
 ```
 
-Use your real absolute path for `command`.
+Set `command` to the real absolute path of your local `gantry/bin/gantry`.
 
 ## 6) Quick verification
 
@@ -89,5 +111,5 @@ Use your real absolute path for `command`.
 
 ## Notes
 
-- `config/agents.json` currently contains absolute paths from another machine. If `./sync-agent` fails, update `config_file` and `prompt_file` paths to your local checkout paths.
+- `config/agents.json` currently contains absolute paths from another machine. If `./sync-agent` fails, update `config_file` and `prompt_file` to paths in your local `./opencode-agent` directory.
 - Keep Gantry and OpenCode running in separate terminals during active work submission.
