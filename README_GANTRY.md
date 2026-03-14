@@ -66,7 +66,29 @@ If you do not already have NATS+JetStream running:
 just up-nats
 ```
 
-Or if you are not using `just`, start your NATS server manually with JetStream enabled and reachable at `nats://127.0.0.1:4222`.
+If `nats-server` is not installed yet, install it first.
+
+macOS (Homebrew):
+
+```bash
+brew install nats-server
+```
+
+Linux (Debian/Ubuntu package flow):
+
+```bash
+sudo apt-get update
+sudo apt-get install -y nats-server
+```
+
+Then start NATS with JetStream enabled (manual fallback when not using `just`):
+
+```bash
+mkdir -p ../gantry/.agf-workspace/nats-data
+nats-server -js -p 4222 -sd ../gantry/.agf-workspace/nats-data
+```
+
+Keep this process running in a dedicated terminal while using Gantry.
 
 ## 3) Run Gantry MCP server
 
@@ -131,5 +153,5 @@ Take this request, create a Gantry workflow/workstream, decompose into impl/test
 
 ## Notes
 
-- `config/agents.json` currently contains absolute paths from another machine. If `./sync-agent` fails, update `config_file` and `prompt_file` to paths in your local `./opencode-agent` directory.
+- `config/agents.json` uses repo-relative paths and works with `./sync-agent` from this repo.
 - Keep Gantry and OpenCode running in separate terminals during active work submission.
