@@ -30,6 +30,15 @@ If `gantry` is missing, clone it into the same parent directory:
 git clone <gantry-repo-url> gantry
 ```
 
+Initialize Gantry workspace metadata in `opencode-agent` once:
+
+```bash
+cd ./opencode-agent
+../gantry/bin/gantry init
+```
+
+This creates local workspace metadata used for stable session identity. Without this, `task claim` and `task complete` can run under different session IDs.
+
 ## Prerequisites
 
 - Go 1.25+
