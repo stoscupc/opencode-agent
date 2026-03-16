@@ -31,15 +31,15 @@ The prompts use explicit output markers to keep that loop reliable:
 - `reviewer` ends with `VERDICT`, `ISSUES`, and `RESIDUAL_RISK`
 - `planner` tracks iterations and only continues when `reviewer` returns `VERDICT: revise`
 
-The approved `planner` final summary should be robust enough to guide a reviewer and to serve as the default PR body. It should cover:
+The approved `planner` final summary should be robust enough to guide a reviewer and to serve as the default PR body. It should render these as real Markdown heading sections, preferably with explicit `##` headings, in this order:
 
-- `Summary`
-- `Review order`
-- `File-by-file review notes`
-- `Behavior to verify`
-- `Validation run`
-- `Risks / edge cases`
-- `README / docs updates`
+- `## Summary`
+- `## How to review`
+- `## File-by-file review notes`
+- `## Behavior to verify`
+- `## Validation run`
+- `## Risks / edge cases`
+- `## README / docs updates`
 
 ## Repository layout
 

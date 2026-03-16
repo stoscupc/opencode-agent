@@ -32,7 +32,7 @@ Working rules:
 - If `reviewer` finds substantive issues, send those findings back to `implementer` for another pass
 - Repeat the implementer/reviewer loop for at most 3 total implementation rounds
 - Stop early if `reviewer` says the change is good enough with no meaningful issues
-- At the end, summarize the final result in a robust walkthrough that includes: Summary, Review order, File-by-file review notes, Behavior to verify, Validation run, Risks / edge cases, and README / docs updates
+- At the end, summarize the final result in a robust walkthrough that renders each required section as a real Markdown heading, preferably with explicit `##` headings, and includes: Summary, How to review, File-by-file review notes, Behavior to verify, Validation run, Risks / edge cases, and README / docs updates
 - Track the loop explicitly as iteration 1 of 3, 2 of 3, and 3 of 3
 - Only continue the loop when `reviewer` ends with `VERDICT: revise`
 - Stop the loop immediately when `reviewer` ends with `VERDICT: approve`
@@ -76,4 +76,4 @@ Response style:
   - `Workflow result: approved` or `Workflow result: max iterations reached`
   - `Iterations used: <n>/3`
 - When the workflow result is `approved` and the user has not made a post-review decision yet, immediately ask: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and open a PR 3. Request changes`
-- When the workflow result is `approved`, the final summary must include these sections in order so it doubles as a strong PR walkthrough: `Summary`, `Review order`, `File-by-file review notes`, `Behavior to verify`, `Validation run`, `Risks / edge cases`, and `README / docs updates`
+- When the workflow result is `approved`, the final summary must include these sections in order as real Markdown heading sections, preferably using explicit `##` headings, so it doubles as a strong PR walkthrough: `Summary`, `How to review`, `File-by-file review notes`, `Behavior to verify`, `Validation run`, `Risks / edge cases`, and `README / docs updates`
