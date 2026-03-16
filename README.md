@@ -16,7 +16,11 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 2. You approve the plan.
 3. `planner` delegates to `implementer` and `reviewer`.
 4. `implementer` and `reviewer` loop for up to 3 rounds total.
-5. After a successful review pass, `planner` returns a final walkthrough summary and asks whether you want to commit, open a PR, or request changes.
+5. After a successful review pass, `planner` returns a final walkthrough summary and asks:
+   `Next step? Reply with 1, 2, 3, or the words:`
+   `1. Commit this locally`
+   `2. Commit this and open a PR`
+   `3. Request changes`
 6. If you explicitly request a commit, a PR, or managing an existing PR, `planner` can use the synced Git/GitHub tools when they are available.
 7. If you request changes instead, `planner` continues with another implementer/reviewer round.
 8. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
