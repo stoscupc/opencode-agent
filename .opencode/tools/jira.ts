@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { existsSync, readFileSync } from "node:fs"
 import { dirname, join, parse } from "node:path"
 
@@ -153,7 +153,7 @@ export default tool({
   args: {
     issueKey: tool.schema.string().describe("Jira issue key, for example PROJ-123"),
   },
-  async execute({ issueKey }, context) {
+  async execute({ issueKey }: { issueKey: string }, context: ToolContext) {
     const fallbackEnv = loadNearestDotEnv(process.cwd())
     const baseUrl = normalizeBaseUrl(requiredEnv("JIRA_BASE_URL", fallbackEnv))
     const email = requiredEnv("JIRA_EMAIL", fallbackEnv)

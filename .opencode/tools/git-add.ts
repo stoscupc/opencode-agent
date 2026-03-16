@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { spawnSync } from "node:child_process"
 
 type GitCommandResult = {
@@ -30,7 +30,7 @@ function runGit(args: string[]): GitCommandResult {
 export default tool({
   description: "Stage Git changes from the current directory downward",
   args: {},
-  async execute(_, context) {
+  async execute(_: Record<string, never>, context: ToolContext) {
     runGit(["rev-parse", "--show-toplevel"])
     runGit(["add", "."])
     const status = runGit(["status", "--short"])

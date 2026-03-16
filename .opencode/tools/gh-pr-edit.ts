@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { spawnSync } from "node:child_process"
 
 type CommandResult = {
@@ -230,7 +230,10 @@ export default tool({
     title: tool.schema.string().optional().describe("Updated pull request title"),
     body: tool.schema.string().optional().describe("Updated pull request body"),
   },
-  async execute({ pullRequest, title, body }, context) {
+  async execute(
+    { pullRequest, title, body }: { pullRequest: string; title?: string; body?: string },
+    context: ToolContext,
+  ) {
     ensureGhAuth()
 
     const nextTitle = title?.trim() ?? ""

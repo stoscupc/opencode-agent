@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { spawnSync } from "node:child_process"
 
 type CommandResult = {
@@ -273,7 +273,7 @@ function extractUrl(output: string): string {
 export default tool({
   description: "Create or return a draft GitHub pull request for the current branch",
   args: {},
-  async execute(_, context) {
+  async execute(_: Record<string, never>, context: ToolContext) {
     runGit(["rev-parse", "--show-toplevel"])
     ensureGhAuth()
 
