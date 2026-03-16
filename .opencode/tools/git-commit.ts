@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { spawnSync } from "node:child_process"
 
 type GitCommandResult = {
@@ -32,7 +32,7 @@ export default tool({
   args: {
     message: tool.schema.string().describe("Commit message passed to git commit -m"),
   },
-  async execute({ message }, context) {
+  async execute({ message }: { message: string }, context: ToolContext) {
     const trimmedMessage = message.trim()
 
     if (!trimmedMessage) {

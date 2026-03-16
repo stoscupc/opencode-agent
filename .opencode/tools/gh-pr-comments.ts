@@ -1,4 +1,4 @@
-import { tool } from "@opencode-ai/plugin"
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import { spawnSync } from "node:child_process"
 
 type CommandResult = {
@@ -312,7 +312,7 @@ export default tool({
       .string()
       .describe("GitHub pull request URL, or a pull request number for the current repository"),
   },
-  async execute({ pullRequest }, context) {
+  async execute({ pullRequest }: { pullRequest: string }, context: ToolContext) {
     ensureGhAuth()
 
     const { repository, number } = parsePullRequestInput(pullRequest)
