@@ -15,10 +15,6 @@ type PullRequestSummary = {
 
 const JIRA_KEY_PATTERN = /\b([A-Z][A-Z0-9]+-\d+)\b/g
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-}
-
 function runCommand(command: string, args: string[]): CommandResult {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
@@ -250,7 +246,12 @@ function ensureJiraKeyInTitle(title: string, branch: string, commits: string[]):
     return title
   }
 
-  const jiraKey = extractJiraKeys([branch, ...commits])[0]
+  const jiraKeySources = [branch, trimmedTitle, ...commits]
+  if (commits.length === 0) {
+    jiraKeySources.push(currentHeadSubject())
+  }
+
+  const jiraKey = extractJiraKeys(jiraKeySources)[0]
   if (!jiraKey) {
     return trimmedTitle
   }
