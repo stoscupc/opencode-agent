@@ -90,8 +90,8 @@ Set these values using your normal environment-loading workflow:
 
 When the Jira tools run, they:
 
-1. checks `process.env` first
-2. falls back to the nearest ancestor `.env` file
+1. check `process.env` first
+2. fall back to the nearest ancestor `.env` file
 
 Fallback is only for `.env` files, not `.env.local` or other variants. If a Jira variable is present in `process.env` but blank, the tool treats it as invalid and does not fall back to `.env` for that variable.
 
