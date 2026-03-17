@@ -13,6 +13,12 @@ type PullRequestSummary = {
   isDraft?: boolean
 }
 
+const JIRA_KEY_PATTERN = /\b([A-Z][A-Z0-9]+-\d+)\b/g
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
 function runCommand(command: string, args: string[]): CommandResult {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
@@ -219,6 +225,47 @@ function buildTitle(branch: string, commits: string[]): string {
   return `Open draft PR for ${branch}`
 }
 
+function extractJiraKeys(values: string[]): string[] {
+  const seen = new Set<string>()
+  const keys: string[] = []
+
+  for (const value of values) {
+    for (const match of value.matchAll(JIRA_KEY_PATTERN)) {
+      const key = match[1]
+      if (!key || seen.has(key)) {
+        continue
+      }
+
+      seen.add(key)
+      keys.push(key)
+    }
+  }
+
+  return keys
+}
+
+function ensureJiraKeyInTitle(title: string, branch: string, commits: string[]): string {
+  const trimmedTitle = title.trim()
+  if (!trimmedTitle) {
+    return title
+  }
+
+  const jiraKey = extractJiraKeys([branch, ...commits])[0]
+  if (!jiraKey) {
+    return trimmedTitle
+  }
+
+  const existingPrefixSeparators = [" ", ":", "-", ")", "]"]
+  if (
+    trimmedTitle === jiraKey ||
+    existingPrefixSeparators.some((separator) => trimmedTitle.startsWith(`${jiraKey}${separator}`))
+  ) {
+    return trimmedTitle
+  }
+
+  return `${jiraKey}: ${trimmedTitle}`
+}
+
 function buildBody(baseBranch: string, branch: string, commits: string[]): string {
   const summary = commits[0] ? `- ${commits[0]}` : "- Draft PR created from the current branch state"
 
@@ -330,7 +377,11 @@ export default tool({
 
     const baseBranch = detectBaseBranch(remote)
     const commits = listCommitSubjects(`refs/remotes/${remote}/${baseBranch}`)
-    const resolvedTitle = title?.trim() || buildTitle(branch, commits)
+    const resolvedTitle = ensureJiraKeyInTitle(
+      title?.trim() || buildTitle(branch, commits),
+      branch,
+      commits,
+    )
     const resolvedBody = body?.trim() || buildBody(baseBranch, branch, commits)
     const create = runGh([
       "pr",

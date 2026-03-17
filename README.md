@@ -167,6 +167,7 @@ If the current local branch is `main`, `planner` must not push directly to `main
 `gh-pr-create` also:
 
 - generates an automatic draft PR title from the branch commits
+- prefixes that title with the first detected Jira key from the branch/commit context for Jira-linked work, unless the title already starts with that key
 - accepts optional `title` and `body` overrides from `planner`
 - keeps its fallback draft PR body intentionally minimal
 - checks for an existing open PR for the current branch and returns that PR instead of creating a duplicate
