@@ -60,11 +60,11 @@ function runGh(args: string[]): CommandResult {
   return runCommand("gh", args)
 }
 
-function ensureGhAuth(host: string): void {
+function getGhAuthError(host: string): Error | null {
   try {
     runGh(["--version"])
   } catch {
-    throw new Error(
+    return new Error(
       "GitHub CLI is required for gh-pr-reply. Install `gh` and ensure it is available on PATH.",
     )
   }
@@ -73,10 +73,12 @@ function ensureGhAuth(host: string): void {
     runGh(["auth", "status", "--hostname", host])
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    throw new Error(
+    return new Error(
       `GitHub CLI authentication is required for gh-pr-reply on ${host}. Run \`gh auth status --hostname ${host}\` and authenticate before retrying. ${message}`,
     )
   }
+
+  return null
 }
 
 function readRemoteUrl(remote: string): string {
@@ -285,7 +287,10 @@ export default tool({
     }
 
     const { repository, number } = parsePullRequestInput(pullRequest)
-    ensureGhAuth(repository.host)
+    const authError = getGhAuthError(repository.host)
+    if (authError) {
+      throw authError
+    }
 
     const parsedCommentId = parseCommentId(commentId)
 
