@@ -22,6 +22,7 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 6. If you explicitly request a commit, a PR, or managing an existing PR, `planner` can use the synced Git/GitHub tools when they are available.
 7. If you request changes instead, `planner` continues with another implementer/reviewer round.
 8. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
+9. If that approved follow-up work is later committed and pushed back to the same PR, `planner` can automatically post review-comment replies that reflect the final implemented outcome.
 
 The prompts use explicit output markers to keep that loop reliable:
 
@@ -109,6 +110,7 @@ This repo also includes project-local Git and GitHub tools in `.opencode/tools/`
 - `gh-pr-create` - pushes the current branch if needed and creates a GitHub draft PR, or returns the existing open PR for that branch instead of creating a duplicate
 - `gh-pr-edit` - updates an existing GitHub pull request title and/or body by PR URL or PR number
 - `gh-pr-comments` - fetches all PR review comments, review summaries, and top-level PR conversation comments for planner-side evaluation
+- `gh-pr-reply` - posts a reply to a GitHub PR review comment thread by PR URL/number and review comment id
 
 These tools are only available after you run `./sync-agent` and reload OpenCode.
 
@@ -125,6 +127,17 @@ When you ask `planner` to review or read comments on a GitHub pull request, it s
 5. ask for approval before sending any follow-up work to `implementer`
 
 This keeps `planner` as the gatekeeper instead of automatically doing whatever PR comments request.
+
+If the user later approves that follow-up work and explicitly asks to commit it in a way that updates and pushes the existing PR, `planner` should automatically post concise replies for all previously assessed `review_comment` items.
+
+Those replies should:
+
+- be posted only after the implementation is approved and the PR update is actually pushed
+- reflect the final implemented outcome, not stale proposal text
+- mention scope changes when the implemented result differs from the original follow-up plan
+- stay limited to PR `review_comment` threads only, not top-level conversation comments
+
+If the user chooses a local-only commit, `planner` should not post any PR comment replies.
 
 ### Draft PR behavior
 
@@ -155,7 +168,7 @@ To use the PR flow successfully:
 - `gh` must already be authenticated for the target GitHub host (`gh auth status` should succeed)
 - normal git push authentication must already work for the repository remote
 
-The same `gh` installation and authentication requirements also apply to `gh-pr-comments` and `gh-pr-edit`.
+The same `gh` installation and authentication requirements also apply to `gh-pr-comments`, `gh-pr-edit`, and `gh-pr-reply`.
 
 ## Example prompt flow
 
