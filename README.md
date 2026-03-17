@@ -14,15 +14,16 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 
 1. `planner` inspects the repo and proposes a plan.
 2. You approve the plan.
-3. `planner` delegates to `implementer` and `reviewer`.
-4. `implementer` and `reviewer` loop for up to 3 rounds total.
-5. After a successful review pass, `planner` returns a final walkthrough summary and asks a numbered next-step prompt with only one option-2 variant based on PR state:
+3. If Jira issue key(s) were part of that approved work, `planner` updates all provided Jira issues to `In Progress` before implementation starts.
+4. `planner` delegates to `implementer` and `reviewer`.
+5. `implementer` and `reviewer` loop for up to 3 rounds total.
+6. After a successful review pass, `planner` returns a final walkthrough summary and asks a numbered next-step prompt with only one option-2 variant based on PR state:
    - if no PR exists yet for the current work: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and open a PR 3. Request changes`
    - if a PR is already open: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and update the PR 3. Request changes`
-6. If you explicitly request a commit, a PR, or managing an existing PR, `planner` can use the synced Git/GitHub tools when they are available.
-7. If you request changes instead, `planner` continues with another implementer/reviewer round.
-8. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
-9. If that approved follow-up work is later committed and pushed back to the same PR, `planner` can automatically post review-comment replies that reflect the final implemented outcome.
+7. If you explicitly request a commit, a PR, or managing an existing PR, `planner` can use the synced Git/GitHub tools when they are available.
+8. If you request changes instead, `planner` continues with another implementer/reviewer round.
+9. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
+10. If that approved follow-up work is later committed and pushed back to the same PR, `planner` can automatically post review-comment replies that reflect the final implemented outcome.
 
 The prompts use explicit output markers to keep that loop reliable:
 
@@ -75,6 +76,7 @@ This repo includes project-local Jira tools in `.opencode/tools/`:
 
 - `jira` at `.opencode/tools/jira.ts` to fetch a Jira issue by key
 - `jira-create` at `.opencode/tools/jira-create.ts` to create a Jira issue in a project, optionally under an epic
+- `jira-update-status` at `.opencode/tools/jira-update-status.ts` to move a Jira issue to a requested status by applying a matching Jira transition, defaulting to `In Progress`
 
 The repo's only declared dependency is `@opencode-ai/plugin`, which the custom tools use.
 
@@ -102,8 +104,12 @@ Example request:
 - `Use the jira tool to fetch PROJ-123`
 - `Use the jira-create tool to create a Task in PROJ with summary "Follow up docs" and description "Document the new workflow."`
 - `Use the jira-create tool to create a Task in PROJ under epic PROJ-123 with summary "Follow up docs" and description "Document the new workflow."`
+- `Use the jira-update-status tool to move PROJ-123 to In Progress`
+- `Use the jira-update-status tool to move PROJ-123 to Done`
 
 If you include Jira issue keys in a planning request, `planner` should fetch them first, summarize the requirements, flag conflicts, ask only when critical details are missing, and pass that Jira context into `implementer` and `reviewer`.
+
+After you approve a plan that included Jira issue key(s), `planner` should update all provided Jira issues to `In Progress` with `jira-update-status` before it starts implementation. If a provided issue does not have a matching `In Progress` transition available, `planner` should stop and report that blocker instead of proceeding.
 
 `planner` should only create a Jira issue with `jira-create` when the user explicitly asks.
 
