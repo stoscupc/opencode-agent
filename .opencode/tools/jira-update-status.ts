@@ -24,7 +24,7 @@ function trimOrDefault(value: string | undefined, fallback: string): string {
 }
 
 function lowerCase(value: string): string {
-  return value.trim().toLocaleLowerCase()
+  return value.trim().toLowerCase()
 }
 
 export default tool({
