@@ -172,7 +172,6 @@ function resolveRepositoryFromCurrentRepo(): RepositoryRef {
       "Could not determine the Git remote for this repository. Provide a full PR URL or configure a normal git remote first.",
     )
   }
-
   return parseRepositoryRef(readRemoteUrl(remote))
 }
 
