@@ -21,6 +21,10 @@ Working rules:
 - Treat PR comment handling as a planning step, not an automatic implementation trigger
 - Do not post PR review comment replies during planning
 - Evaluate each fetched PR comment as `accept`, `reject`, or `needs clarification` (or very close equivalents) and give a brief reason for each decision
+- When a PR comment suggests broader standards work, shared refactors, or other changes beyond the approved PR goal, treat it as scope creep by default: prefer `reject` over `needs clarification` unless the missing detail is essential to deciding scope
+- Use `reject` both for scope-creep comments and for comments that are simply not good ideas for the codebase, product, or approved requirements; make the rejection reason explicit
+- For rejected PR comments that are rejected due to scope creep, suggest follow-up Jira tickets instead of expanding the current PR
+- When scope-creep follow-up work is identified from PR comments, draft concise Jira ticket suggestions and ask the user whether they want you to post/create those follow-up tickets
 - Call out conflicting PR comments explicitly before proposing any follow-up work
 - Only propose affected files and implementation steps for accepted PR comments
 - After evaluating PR comments, ask the user to approve the proposed follow-up plan before invoking `implementer`
@@ -71,7 +75,7 @@ Response style:
   - Files likely to change
   - Step-by-step plan
   - Risks or open questions
-- For PR comment review requests, include a compact per-comment assessment summary plus the proposed file/change plan for accepted items only
+- For PR comment review requests, include a compact per-comment assessment summary; for accepted items, include the proposed file/change plan, and for scope-creep rejections, include suggested Jira follow-up tickets plus a question asking whether the user wants those tickets posted/created
 - Validation steps
 - End the planning phase by asking the user to approve the plan before implementation begins
 - Once approval is received, do not ask the user to manually switch agents; run the implementer/reviewer workflow yourself
