@@ -4,11 +4,27 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 
 ## Quick start
 
+Keep normal local setup in this one section:
+
+### One-time OpenCode setup
+
+1. Run `make setup`.
+2. If OpenCode was just auto-installed, run `opencode`.
+3. Use `/connect` to configure a provider.
+4. Rerun `make setup`.
+
+### This repo
+
 1. Edit the prompts in `prompts/` and agent settings in `config/` as needed.
-2. Run `./sync-agent`.
-3. Reload OpenCode.
-4. Start with `planner` (the current default agent).
-5. Ask `planner` to inspect the repo and propose a plan.
+2. Set any needed environment variables for this repo.
+3. Run `make setup`.
+4. Reload or restart OpenCode.
+5. Start with `planner` (the current default agent).
+6. Ask `planner` to inspect the repo and propose a plan.
+
+`make setup` is the normal setup entry point. It auto-installs `opencode` with Homebrew when available, then stops until you complete the interactive `opencode` `/connect` step and rerun it. It keeps `python3` as a hard blocker, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
+
+Use `./sync-agent` directly only for advanced/manual syncing when you are iterating on prompts, agent config, or files under `.opencode/tools/` and want that lower-level step by itself.
 
 ## Default workflow
 
@@ -51,14 +67,17 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 - `config/agents.json` - agent manifest; currently sets `planner` as the default agent
 - `config/*.json` - per-agent metadata used by the sync script
 - `.opencode/tools/` - project-local custom tools for Jira and Git actions
-- `sync-agent` - installs configured agents and copies project-local tools into your OpenCode config
+- `Makefile` - includes `make setup` for normal local repo setup
+- `sync-agent` - lower-level sync script used by `make setup` and by agent/tool authors
 - `examples/sample-task.md` - a small example prompt flow for sanity-checking the setup
 
 `src/` and `tests/` exist but are not the center of this skeleton today.
 
-## Syncing agents and tools
+## Advanced: syncing agents and tools manually
 
-Run `./sync-agent` whenever you update prompts, agent config, or files under `.opencode/tools/`.
+Most users should use `make setup`.
+
+Run `./sync-agent` directly only when you are iterating on prompts, agent config, or files under `.opencode/tools/` and want the lower-level sync step by itself.
 
 The script:
 
@@ -82,13 +101,13 @@ The repo's only declared dependency is `@opencode-ai/plugin`, which the custom t
 
 ### Jira environment variables
 
-Set these values using your normal environment-loading workflow:
+Set these values using your normal environment-loading workflow before using the Jira tools:
 
 - `JIRA_BASE_URL` - for example `https://your-domain.atlassian.net`
 - `JIRA_EMAIL` - the email address used for Jira API-token auth
 - `JIRA_API_TOKEN` - the Jira API token paired with that email
 
-`.env.example` shows the expected variable names.
+`.env.example` shows the expected variable names. A local `.env` file is also supported as a fallback by the Jira tools.
 
 When the Jira tools run, they:
 
@@ -125,7 +144,7 @@ This repo also includes project-local Git and GitHub tools in `.opencode/tools/`
 - `gh-pr-comments` - fetches all PR review comments, review summaries, and top-level PR conversation comments for planner-side evaluation
 - `gh-pr-reply` - posts a reply to a GitHub PR review comment thread by PR URL/number and review comment id
 
-These tools are only available after you run `./sync-agent` and reload OpenCode.
+These tools are only available after you run `make setup` (or `./sync-agent` directly) and reload OpenCode.
 
 They should only be used after the implementer/reviewer workflow is complete and the user explicitly asks to commit, open a PR, or manage an existing PR. If the synced tools are not available in the runtime, `planner` should say so and ask the user to sync/reload rather than pretending it can commit or open/manage a PR.
 

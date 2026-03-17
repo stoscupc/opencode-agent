@@ -18,6 +18,17 @@ TOOLS_DIR = OPENCODE_DIR / "tools"
 OPENCODE_CONFIG_PATH = OPENCODE_DIR / "opencode.json"
 
 
+def display_path(path: Path) -> str:
+    home = Path.home()
+
+    try:
+        relative_path = path.relative_to(home)
+    except ValueError:
+        return str(path)
+
+    return str(Path("~") / relative_path)
+
+
 def load_text(path: Path) -> str:
     return path.read_text(encoding="utf-8").strip() + "\n"
 
@@ -270,15 +281,10 @@ def main() -> int:
         print(f"Could not update {OPENCODE_CONFIG_PATH}: {exc}", file=sys.stderr)
         return 1
 
-    print("Synced agents:")
-    for agent_path in agent_paths:
-        print(f"- {agent_path}")
+    print(f"✅ Synced agents ({len(agent_paths)})")
     if tool_paths:
-        print("Synced tools:")
-        for tool_path in tool_paths:
-            print(f"- {tool_path}")
-    print(f"Set default_agent to '{default_agent}' in {config_path}")
-    print("Reload OpenCode to pick up the updated agents and tools.")
+        print(f"✅ Synced tools ({len(tool_paths)})")
+    print(f"✅ Set default_agent to '{default_agent}' in {display_path(config_path)}")
     return 0
 
 
