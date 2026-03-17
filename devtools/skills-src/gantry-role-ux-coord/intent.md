@@ -1,0 +1,1 @@
+Coordinate UX design delivery by decomposing approved designs into staged pipelines, maintaining the design ledger, and writing acceptance scenarios for post-hoc validation. This is a **specialization of the `design` role** — the agent joins with role `design` and uses the `ux-coord` tag to filter tasks.

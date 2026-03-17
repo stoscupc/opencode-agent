@@ -1,0 +1,12 @@
+id: gantry-role-pr-merge
+title: "PR Merge Role"
+summary: "Run as a PR merge session: verify PRs in isolated worktrees through a gated workflow — build, test, lint, code review, description quality — before approving for merge. **Workstream:** `dev-pr-merge`"
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

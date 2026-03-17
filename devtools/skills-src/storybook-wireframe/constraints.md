@@ -1,0 +1,14 @@
+- NEVER import from production stores or components — wireframes are self-contained (exception: real components for fidelity, documented in header)
+- NEVER skip the `eslint-disable i18next/no-literal-string` pragma on line 1
+- NEVER use i18n keys in wireframes — use literal English strings throughout
+- Always place wireframe files at `web/storybook/stories/wireframes/<FeatureName>.stories.tsx`
+- Always include the full file header: description, interaction model, story list, design ref, existing component path
+- Always define mock types and fixture data inline — no external data imports
+- Always use the canonical `roleColors` map for role-tagged elements — do not invent new role colors
+- Always use the canonical `severityColors` map with gradients for severity states
+- Always set `meta.title` to start with `Wireframes/` for proper Storybook grouping
+- Minimum 2 stories per wireframe (populated + empty); target 4-6 covering all primary states
+- Use CSS custom properties (`--z-space-*`, `--z-bg`, `--z-text-primary`) with hex fallbacks for Storybook
+- Type-check with `npx tsc --noEmit --pretty <file>` before completing — only upstream `node_modules` errors are acceptable
+- Always call `broadcast_result` with kind=build after type-check, then `task_complete` with the file list
+- Background: `#161616`, Surface: `#262626`, Text primary: `#f4f4f4`, Border subtle: `#393939`

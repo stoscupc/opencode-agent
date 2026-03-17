@@ -1,0 +1,12 @@
+id: storybook-wireframe
+title: "Storybook Wireframe Template"
+summary: "Create a wireframe story file for a new UI feature. All new UX work MUST start as a wireframe `.stories.tsx` file before implementation begins."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: browser

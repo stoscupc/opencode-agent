@@ -1,0 +1,12 @@
+id: gantry-role-review
+title: "Review Role"
+summary: "Run as a review session: commit staged work in clean conventional commits, then code-review recent commits and create tasks for issues found."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

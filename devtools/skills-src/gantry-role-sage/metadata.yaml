@@ -1,0 +1,12 @@
+id: gantry-role-sage
+title: "Sage Role"
+summary: "Analyze scribe logs, coordination patterns, and project plans to identify systemic improvements, recurring problems, and prioritization insights."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

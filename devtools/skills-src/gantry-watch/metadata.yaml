@@ -1,0 +1,12 @@
+id: gantry-watch
+title: "Watch Events"
+summary: "Subscribe to and monitor zdev coordination events."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

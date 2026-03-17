@@ -1,0 +1,3 @@
+Plan multi-step work using future-aware reasoning instead of step-wise greedy decomposition. Step-wise reasoning (decompose, then execute in order) is provably suboptimal for long-horizon tasks because early myopic commitments become irreversible and compound into plan failure. This skill implements three principles from planning theory — explicit lookahead, backward value propagation, and limited commitment — to produce coherent plans that survive contact with reality.
+
+Use this skill BEFORE beginning any work that involves 4+ steps, crosses multiple workstreams or roles, has ordering dependencies, or spans more than one milestone. The output is a plan document with a dependency DAG, risk analysis, and a single committed next action.

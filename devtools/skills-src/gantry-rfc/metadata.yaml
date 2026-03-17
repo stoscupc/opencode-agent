@@ -1,0 +1,12 @@
+id: gantry-rfc
+title: "RFC Workflow"
+summary: "Create and review RFCs using zdev."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

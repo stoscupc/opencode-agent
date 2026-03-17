@@ -1,0 +1,12 @@
+id: gantry-session
+title: "Session Coordination"
+summary: "Register, list, and manage zdev coordination sessions."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

@@ -1,0 +1,12 @@
+id: test-all
+title: "Run All Tests"
+summary: "Run tests across the monorepo."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

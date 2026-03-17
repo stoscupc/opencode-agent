@@ -1,0 +1,12 @@
+id: gantry-role-design
+title: "Design Role"
+summary: "Run as a design session: create RFCs, iterate on designs, solicit adversarial review."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

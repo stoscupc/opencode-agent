@@ -1,0 +1,12 @@
+id: expert-gemma3-tuning
+title: "Gemma3 Eval & Tuning"
+summary: "Run evaluations, diagnose failures, and tune workflow parameters to improve Gemma3 model accuracy on z-tf-expert pipelines."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

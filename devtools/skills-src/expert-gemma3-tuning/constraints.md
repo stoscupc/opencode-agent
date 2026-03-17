@@ -1,0 +1,12 @@
+- NEVER modify eval framework code (`eval/`) without running `go test -v ./eval/...` to verify
+- NEVER change baseline files without explicit user approval — baselines are the source of truth for regression detection
+- NEVER tune parameters blindly — always run the relevant eval category first to establish a before measurement
+- Always run the full eval suite after parameter changes to detect cross-category regressions
+- Always specify `-model gemma3:12b-it-qat` explicitly — do not rely on default model selection
+- Use `WF_*` environment variables for tuning — do not modify Go source constants
+- When comparing models, run both with identical eval cases and `-save-baseline -format both`
+- Regression thresholds: duration >20% slower = warn, >50% = error; quality >5% drop = warn, >15% = error
+- Always dump traces (`-dump <RUN_ID>`) before diagnosing a failure — do not guess from summary output alone
+- Keep search limits within Gemma3's 8K context window: `WF_SEARCH_KNOWLEDGE_MAX <= 4`, `WF_SEARCH_ENRICH_MAX <= 2`
+- Requires Ollama running with `gemma3:12b-it-qat` model pulled — verify with `ollama list` before starting
+- Requires z-tf-expert services (hmc-sim, z-manuals-kb) running for end-to-end eval cases

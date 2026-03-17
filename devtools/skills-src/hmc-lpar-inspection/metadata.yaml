@@ -1,0 +1,17 @@
+id: hmc-lpar-inspection
+title: "HMC LPAR Inspection and Validation"
+summary: "Inspect and validate LPARs running on HMC: check status, configuration, and operational health across CPCs."
+owners:
+  - unassigned
+version: 1
+triggers:
+  - User asks to inspect LPARs on HMC
+  - User asks to validate LPAR configuration
+  - User asks what LPARs are running
+  - User asks to check LPAR health
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

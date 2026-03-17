@@ -1,0 +1,12 @@
+id: gantry-role-bugfix
+title: "Bugfix Role"
+summary: "Run as a bugfix session: claim bug tasks, produce prioritized fixes with regression tests."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

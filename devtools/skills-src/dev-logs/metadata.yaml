@@ -1,0 +1,12 @@
+id: dev-logs
+title: "View Dev Service Logs"
+summary: "View logs from running dev environment services."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

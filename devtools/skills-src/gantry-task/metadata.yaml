@@ -1,0 +1,12 @@
+id: gantry-task
+title: "Task Coordination"
+summary: "Create, claim, complete, and manage tasks via zdev MCP tools."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

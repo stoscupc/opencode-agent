@@ -1,0 +1,15 @@
+id: commit
+title: Commit
+summary: Stage and commit focused changes using small, conventional commits without AI branding.
+owners:
+  - devtools
+version: 1
+triggers:
+  - User asks to commit current work
+  - User asks to stage and commit changes
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

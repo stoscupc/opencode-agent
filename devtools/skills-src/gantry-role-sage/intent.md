@@ -1,0 +1,1 @@
+Analyze scribe logs, coordination history, task outcomes, and project plans to identify systemic improvements, recurring problems, workflow anti-patterns, and prioritization insights. The sage turns raw observations into actionable knowledge that improves team effectiveness over time.

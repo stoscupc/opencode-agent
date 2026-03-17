@@ -1,0 +1,12 @@
+id: build-all
+title: "Build All Projects"
+summary: "Build all projects in the monorepo."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit
