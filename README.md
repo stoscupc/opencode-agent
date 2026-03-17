@@ -16,14 +16,13 @@ This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is 
 2. You approve the plan.
 3. `planner` delegates to `implementer` and `reviewer`.
 4. `implementer` and `reviewer` loop for up to 3 rounds total.
-5. After a successful review pass, `planner` returns a final walkthrough summary and asks:
-   `Next step? Reply with 1, 2, 3, or the words:`
-   `1. Commit this locally`
-   `2. Commit this and open a PR`
-   `3. Request changes`
+5. After a successful review pass, `planner` returns a final walkthrough summary and asks a numbered next-step prompt with only one option-2 variant based on PR state:
+   - if no PR exists yet for the current work: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and open a PR 3. Request changes`
+   - if a PR is already open: `Next step? Reply with 1, 2, 3, or the words: 1. Commit this locally 2. Commit this and update the PR 3. Request changes`
 6. If you explicitly request a commit, a PR, or managing an existing PR, `planner` can use the synced Git/GitHub tools when they are available.
 7. If you request changes instead, `planner` continues with another implementer/reviewer round.
 8. If you ask `planner` to review PR comments, it fetches them first, evaluates which comments are worth acting on, proposes a minimal follow-up plan, and waits for approval before any implementation starts.
+9. If that approved follow-up work is later committed and pushed back to the same PR, `planner` can automatically post review-comment replies that reflect the final implemented outcome.
 
 The prompts use explicit output markers to keep that loop reliable:
 
@@ -31,15 +30,17 @@ The prompts use explicit output markers to keep that loop reliable:
 - `reviewer` ends with `VERDICT`, `ISSUES`, and `RESIDUAL_RISK`
 - `planner` tracks iterations and only continues when `reviewer` returns `VERDICT: revise`
 
-The approved `planner` final summary should be robust enough to guide a reviewer and to serve as the default PR body. It should cover:
+The approved `planner` final summary should be robust enough to guide a reviewer and to serve as the default PR body. It should render these as real Markdown heading sections, preferably with explicit `##` headings, in this order:
 
-- `Summary`
-- `Review order`
-- `File-by-file review notes`
-- `Behavior to verify`
-- `Validation run`
-- `Risks / edge cases`
-- `README / docs updates`
+- `## Summary`
+- `## How to review`
+- `## File-by-file review notes`
+- `## Behavior to verify`
+- `## Validation run`
+- `## Risks / edge cases`
+- `## README / docs updates`
+
+In `## File-by-file review notes`, include changed line numbers or line ranges when practical. Keep that guidance lightweight by preferring the current diff's changed ranges over overly granular references.
 
 ## Repository layout
 
@@ -109,6 +110,7 @@ This repo also includes project-local Git and GitHub tools in `.opencode/tools/`
 - `gh-pr-create` - pushes the current branch if needed and creates a GitHub draft PR, or returns the existing open PR for that branch instead of creating a duplicate
 - `gh-pr-edit` - updates an existing GitHub pull request title and/or body by PR URL or PR number
 - `gh-pr-comments` - fetches all PR review comments, review summaries, and top-level PR conversation comments for planner-side evaluation
+- `gh-pr-reply` - posts a reply to a GitHub PR review comment thread by PR URL/number and review comment id
 
 These tools are only available after you run `./sync-agent` and reload OpenCode.
 
@@ -125,6 +127,17 @@ When you ask `planner` to review or read comments on a GitHub pull request, it s
 5. ask for approval before sending any follow-up work to `implementer`
 
 This keeps `planner` as the gatekeeper instead of automatically doing whatever PR comments request.
+
+If the user later approves that follow-up work and explicitly asks to commit it in a way that updates and pushes the existing PR, `planner` should automatically post concise replies for all previously assessed `review_comment` items.
+
+Those replies should:
+
+- be posted only after the implementation is approved and the PR update is actually pushed
+- reflect the final implemented outcome, not stale proposal text
+- mention scope changes when the implemented result differs from the original follow-up plan
+- stay limited to PR `review_comment` threads only, not top-level conversation comments
+
+If the user chooses a local-only commit, `planner` should not post any PR comment replies.
 
 ### Draft PR behavior
 
@@ -155,7 +168,7 @@ To use the PR flow successfully:
 - `gh` must already be authenticated for the target GitHub host (`gh auth status` should succeed)
 - normal git push authentication must already work for the repository remote
 
-The same `gh` installation and authentication requirements also apply to `gh-pr-comments` and `gh-pr-edit`.
+The same `gh` installation and authentication requirements also apply to `gh-pr-comments`, `gh-pr-edit`, and `gh-pr-reply`.
 
 ## Example prompt flow
 
