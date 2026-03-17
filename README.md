@@ -69,9 +69,12 @@ If `~/.config/opencode/opencode.json` already exists, the script preserves other
 
 After syncing, reload OpenCode so the updated agents and custom tools are available.
 
-## Jira tool
+## Jira tools
 
-This repo includes a project-local `jira` tool at `.opencode/tools/jira.ts`. It fetches a Jira issue by key using the Jira Cloud REST API.
+This repo includes project-local Jira tools in `.opencode/tools/`:
+
+- `jira` at `.opencode/tools/jira.ts` to fetch a Jira issue by key
+- `jira-create` at `.opencode/tools/jira-create.ts` to create a Jira issue in a project
 
 The repo's only declared dependency is `@opencode-ai/plugin`, which the custom tools use.
 
@@ -85,7 +88,7 @@ Set these values using your normal environment-loading workflow:
 
 `.env.example` shows the expected variable names.
 
-When the Jira tool runs, it:
+When the Jira tools run, they:
 
 1. checks `process.env` first
 2. falls back to the nearest ancestor `.env` file
@@ -97,8 +100,11 @@ Fallback is only for `.env` files, not `.env.local` or other variants. If a Jira
 Example request:
 
 - `Use the jira tool to fetch PROJ-123`
+- `Use the jira-create tool to create a Task in PROJ with summary "Follow up docs" and description "Document the new workflow."`
 
 If you include Jira issue keys in a planning request, `planner` should fetch them first, summarize the requirements, flag conflicts, ask only when critical details are missing, and pass that Jira context into `implementer` and `reviewer`.
+
+`planner` should only create a Jira issue with `jira-create` when the user explicitly asks.
 
 ## Git tools
 
