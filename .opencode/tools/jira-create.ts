@@ -119,6 +119,10 @@ export default tool({
     summary: tool.schema.string().describe("Jira issue summary"),
     description: tool.schema.string().describe("Jira issue description"),
     issueType: tool.schema.string().optional().describe("Jira issue type name, defaults to Task"),
+    epicIssueKey: tool.schema
+      .string()
+      .optional()
+      .describe("Optional Jira epic issue key, for example PROJ-123"),
     labels: tool.schema
       .array(tool.schema.string())
       .optional()
@@ -130,12 +134,14 @@ export default tool({
       summary,
       description,
       issueType,
+      epicIssueKey,
       labels,
     }: {
       projectKey: string
       summary: string
       description: string
       issueType?: string
+      epicIssueKey?: string
       labels?: string[]
     },
     context: ToolContext,
@@ -150,6 +156,7 @@ export default tool({
     const trimmedSummary = summary.trim()
     const trimmedDescription = description.trim()
     const trimmedIssueType = issueType?.trim() || "Task"
+    const trimmedEpicIssueKey = epicIssueKey?.trim() || ""
     const trimmedLabels = (labels ?? []).map((label) => label.trim()).filter(Boolean)
 
     if (!trimmedProjectKey) {
@@ -170,6 +177,7 @@ export default tool({
         summary: string
         description: ReturnType<typeof toAdfDescription>
         issuetype: { name: string }
+        parent?: { key: string }
         labels?: string[]
       }
     } = {
@@ -185,6 +193,10 @@ export default tool({
       payload.fields.labels = trimmedLabels
     }
 
+    if (trimmedEpicIssueKey) {
+      payload.fields.parent = { key: trimmedEpicIssueKey }
+    }
+
     const response = await fetch(`${baseUrl}/rest/api/3/issue`, {
       method: "POST",
       headers: {
@@ -198,8 +210,11 @@ export default tool({
     if (!response.ok) {
       const body = (await response.text()).trim()
       const details = body ? `: ${body.slice(0, 500)}` : ""
+      const epicDetails = trimmedEpicIssueKey
+        ? ` Parent epic supplied: ${trimmedEpicIssueKey}.`
+        : ""
       throw new Error(
-        `Jira request failed (${response.status} ${response.statusText})${details}`,
+        `Jira request failed (${response.status} ${response.statusText}).${epicDetails}${details}`,
       )
     }
 

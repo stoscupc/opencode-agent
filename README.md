@@ -74,7 +74,7 @@ After syncing, reload OpenCode so the updated agents and custom tools are availa
 This repo includes project-local Jira tools in `.opencode/tools/`:
 
 - `jira` at `.opencode/tools/jira.ts` to fetch a Jira issue by key
-- `jira-create` at `.opencode/tools/jira-create.ts` to create a Jira issue in a project
+- `jira-create` at `.opencode/tools/jira-create.ts` to create a Jira issue in a project, optionally under an epic
 
 The repo's only declared dependency is `@opencode-ai/plugin`, which the custom tools use.
 
@@ -101,6 +101,7 @@ Example request:
 
 - `Use the jira tool to fetch PROJ-123`
 - `Use the jira-create tool to create a Task in PROJ with summary "Follow up docs" and description "Document the new workflow."`
+- `Use the jira-create tool to create a Task in PROJ under epic PROJ-123 with summary "Follow up docs" and description "Document the new workflow."`
 
 If you include Jira issue keys in a planning request, `planner` should fetch them first, summarize the requirements, flag conflicts, ask only when critical details are missing, and pass that Jira context into `implementer` and `reviewer`.
 

@@ -15,4 +15,4 @@ Suggested flow:
 
 PR comment follow-up example:
 
-- Ask `planner`: `Review the comments on https://github.com/example/repo/pull/123. Fetch all review comments, review summaries, and top-level PR comments first. Assess each comment as accept, reject, or needs clarification, propose a minimal implementation plan for accepted items only, and ask for approval before implementing anything.`
+- Ask `planner`: `Review the comments on https://github.com/example/repo/pull/123. Fetch all review comments, review summaries, and top-level PR comments first. Reject scope-creep suggestions by default, reject bad ideas explicitly when they should not be implemented, draft Jira follow-up tickets for scope-creep items, propose a minimal implementation plan for accepted items only, and ask whether to post the Jira tickets plus approve any implementation before doing anything.`
