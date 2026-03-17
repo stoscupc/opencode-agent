@@ -1,0 +1,14 @@
+- NEVER remove or rewrite existing narrative documentation in workflow files — preserve all explanatory prose
+- NEVER use step IDs that conflict with existing steps in the same workflow file
+- Always start workflows with an `hmc.authenticate` step and end with `hmc.logout`
+- Always use `on_error: retry(3)` for network-dependent API calls (authentication, list operations)
+- Always use `on_error: skip` for optional information-gathering steps that should not block the workflow
+- Always validate `{{var}}` references resolve to declared params or prior step outputs
+- Workflow files MUST live in `z-tf-expert/docs/workflows/` — do not create workflows elsewhere
+- Every workflow MUST have a standard header: title, outcome, grounding, and parameters sections
+- Every workflow MUST have a `params` scripted block defining all required and optional inputs
+- Use `register` when the full raw API result is needed by later steps — do not parse inline
+- Use `validate` after critical steps (activation, deactivation, IPL) to fail fast on broken invariants
+- Reference HMC docs via `mcp__z-manuals-kb__search` to verify correct API paths and property names — do not guess
+- Test workflow parsing by verifying all ```scripted``` blocks are extractable — malformed blocks break the parser
+- Keep step IDs short and descriptive (e.g., `auth`, `list_cpcs`, `get_cpc_detail`) — avoid verbose names

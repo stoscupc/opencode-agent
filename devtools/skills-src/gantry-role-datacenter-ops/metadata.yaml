@@ -1,0 +1,12 @@
+id: gantry-role-datacenter-ops
+title: "Datacenter-Ops Role"
+summary: "Run as a datacenter-ops session: respond to sentinel-detected hardware failures, drive remediation workflows, and restore hardware to operating state."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: readonly

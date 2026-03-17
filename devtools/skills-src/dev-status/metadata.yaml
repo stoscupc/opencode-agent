@@ -1,0 +1,12 @@
+id: dev-status
+title: "Dev Environment Status"
+summary: "Show the status of all dev services."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

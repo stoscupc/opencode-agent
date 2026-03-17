@@ -1,0 +1,7 @@
+- `just lint` uses `||` to report issues without failing the build — each target prints a warning but continues. CI recipes should use `set -e` for strict failure.
+- All Go projects require golangci-lint v2 config format (`version: "2"` at top of `.golangci.yml`). Projects without a config file use golangci-lint defaults.
+- Rust projects use `cargo clippy -- -D warnings` (warnings treated as errors).
+- Web ESLint config (`web/.eslintrc.cjs`) only covers `.js/.mjs/.cjs` files. TypeScript linting requires installing `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin`.
+- Some Go projects need `GOFLAGS="-buildvcs=false"` (hmc-sim, devtools, z-pkg) to avoid VCS stamping errors in monorepo subdirectories.
+- Markdown linting requires `markdownlint-cli2` to be installed; the recipe skips gracefully if unavailable.
+- LaTeX linting uses `chktex` with the shared config at `tex/shared/.chktexrc`.

@@ -1,0 +1,12 @@
+id: lint-markdown-fix
+title: "Fix Markdown Lint Issues"
+summary: "Run markdown linter, split errors into batched artifacts, create parallel zdev tasks for agents to fix."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

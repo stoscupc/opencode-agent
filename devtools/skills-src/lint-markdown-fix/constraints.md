@@ -1,0 +1,10 @@
+- **MD040 requires judgment**: Never use a generic `text` language tag when the content is clearly a specific language. Inspect the code block contents to determine the correct language identifier.
+- **Common language identifiers**: `bash`, `go`, `rust`, `python`, `yaml`, `json`, `hcl`, `toml`, `sql`, `xml`, `html`, `css`, `javascript`, `typescript`, `diff`, `console`, `ini`, `c`, `cpp`, `text`, `markdown`, `mermaid`, `graphql`, `protobuf`, `gremlin`.
+- **`text` is a last resort**: Use `text` only for genuinely language-agnostic content (plain prose, ASCII art, directory trees, pseudo-code without a clear language).
+- **Preserve content**: Never modify the content inside code blocks — only add/fix the language tag on the opening fence.
+- **MD036 heading conversion**: When converting bold emphasis to headings, choose the correct heading level based on surrounding context (e.g., if between `##` sections, use `###`).
+- **Verify before completing**: Every task must pass `markdownlint-cli2` on its file set before marking complete.
+- **No unnecessary changes**: Do not reformat, rewrap, or restyle content beyond what the lint rules require.
+- **Batch independence**: Each batch can be fixed independently and in parallel. No cross-batch dependencies.
+- **Commit granularity**: One commit per batch (not per file). Use conventional commit format: `docs(<scope>): fix markdown lint errors`.
+- **isof/ archive docs**: These are historical/archived documents. Fix lint issues but do not modernize or restructure content.

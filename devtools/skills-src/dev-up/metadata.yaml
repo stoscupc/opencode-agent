@@ -1,0 +1,12 @@
+id: dev-up
+title: "Start Dev Environment"
+summary: "Start all (or specific) services in a tmux session."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

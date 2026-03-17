@@ -1,0 +1,1 @@
+Stage and commit the current changes using small, focused conventional commits without AI branding. Groups related changes into logical units, stages selectively, and handles pre-commit hook failures.

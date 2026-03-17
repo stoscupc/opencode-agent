@@ -1,0 +1,1 @@
+Run as a test session: write and run tests against real components (simulators, in-process servers), report coverage gaps, create bugfix tasks. Prefer real component validation over mocks — use in-process simulators (hmc-sim, iocp-sim) to test against actual state machines, API contracts, and persistence layers.

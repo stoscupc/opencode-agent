@@ -1,0 +1,12 @@
+id: dev-down
+title: "Stop Dev Environment"
+summary: "Stop all (or specific) services and kill the tmux session."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

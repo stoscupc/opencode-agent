@@ -1,0 +1,16 @@
+id: flare-plan
+title: "Future-Aware Planning"
+summary: "Plan multi-step work using explicit lookahead, backward evaluation, and limited commitment to avoid greedy early-commitment failures. Invoke before starting any long-horizon task that spans multiple workstreams, roles, or phases."
+owners:
+  - unassigned
+version: 1
+triggers:
+  - "User asks to plan a complex multi-step project"
+  - "User asks to plan work across multiple workstreams or milestones"
+  - "User invokes /flare-plan"
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit

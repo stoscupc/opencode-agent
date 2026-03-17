@@ -1,0 +1,5 @@
+nats:
+    url: nats://localhost:4222
+fabric: z-local
+cluster: dev-0
+component: zdev

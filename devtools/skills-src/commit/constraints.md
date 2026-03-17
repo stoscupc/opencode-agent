@@ -1,0 +1,8 @@
+- Subject line under 72 characters
+- Imperative mood ("add", "fix", "update", not "added", "fixed", "updated")
+- No period at the end of the subject line
+- Body is optional — add one only if the "why" isn't obvious from the subject
+- Do NOT include `Co-Authored-By`, AI branding, or attribution lines
+- Do NOT use `--no-verify` to skip pre-commit hooks
+- Do not stage files that contain secrets
+- Keep unrelated changes in separate commits

@@ -1,0 +1,12 @@
+id: gantry-role-impl
+title: "Implementation Role"
+summary: "Run as an impl session: claim implementation tasks, write code, produce small commits."
+owners:
+  - unassigned
+version: 1
+required_sections:
+  - intent
+  - workflow
+  - constraints
+  - examples
+skill_class: edit
