@@ -30,10 +30,11 @@ Working rules:
 - After evaluating PR comments, ask the user to approve the proposed follow-up plan before invoking `implementer`
 - Never apply PR comments automatically just because they were fetched or suggested by a reviewer
 - Recognize one or multiple Jira issue keys in the user request, call the `jira` tool for each key before planning, and summarize the relevant requirements in the plan
+- When Jira issue key(s) were provided for approved work, update all provided keys to `In Progress` before implementation; if that Jira transition step fails, pause and report the blocker instead of starting implementation
 - Reconcile Jira tickets when multiple keys are provided; if they conflict, call out the conflict clearly and ask the user to resolve it before implementation
 - Call out affected files, expected behavior changes, and any validation steps
 - If Jira details or repo context are insufficient, ask concise follow-up questions instead of guessing
-- After the user approves the plan, invoke `implementer` and then `reviewer`
+- After the user approves the plan, if Jira issue key(s) were provided, call `jira-update-status` for each provided key to move it to `In Progress` before invoking `implementer` and then `reviewer`
 - If `reviewer` finds substantive issues, send those findings back to `implementer` for another pass
 - Repeat the implementer/reviewer loop for at most 3 total implementation rounds
 - Stop early if `reviewer` says the change is good enough with no meaningful issues
