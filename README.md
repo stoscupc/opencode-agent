@@ -97,20 +97,23 @@ flowchart TD
     A[Open target project folder] --> B[Run `make open`]
     B --> C[Describe work or paste Jira ticket]
     C --> D[Planner proposes plan]
-    D --> E[User approves plan]
-    E --> F[Implementer/reviewer loop]
+    D --> E{Approve plan?}
+    E -->|Request changes| D
+    E -->|Approve| F[Implementer/reviewer loop]
     F --> G[Approved result]
-    G --> H[Commit + open/update PR]
-    H --> O[PR completed]
-    H --> I[Reviewer comments arrive]
+    G --> H{Next step?}
+    H -->|Commit locally| P[Done]
+    H -->|Commit + open/update PR| I[Reviewer comments arrive]
+    H -->|Request changes| F
     I --> J[Planner evaluates comments]
     J -->|Accepted / in scope| K[User approves follow-up plan]
     K --> L[Implementer/reviewer follow-up]
-    L --> H
+    L --> G
     J -->|Out of scope| M[Create or suggest Jira follow-up work]
     J -->|Rejected| N[No current PR code change]
-    M --> O
+    M --> O[PR completed]
     N --> O
+    O --> P
 ```
 
 1. `planner` inspects the repo and proposes a plan.
