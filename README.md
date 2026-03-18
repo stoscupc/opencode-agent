@@ -1,6 +1,20 @@
 # OpenCode Multi-Agent Skeleton
 
-This repo is a prompt-first skeleton for a three-agent OpenCode workflow. It is centered on editable prompts, agent config, and project-local tools rather than application code.
+This repo is a prompt-first skeleton for running OpenCode in a lightweight development workflow. It syncs project-local prompts, agent config, and tools into your OpenCode setup so you can use `planner`, `implementer`, and `reviewer` to plan work, implement approved changes, review them, and then optionally handle Jira and GitHub follow-up tasks.
+
+It includes project-local integrations for:
+
+- Jira issue lookup, creation, and status updates
+- Git and GitHub workflows such as commits, draft PR creation, PR edits, and PR comment review/replies
+
+## Prerequisites
+
+Before using this repo, make sure you have:
+
+- OpenCode available on your machine, or Homebrew so `make setup` can install it for you
+- Python 3 on `PATH`
+- GitHub CLI (`gh`) installed and authenticated if you want PR-related workflows
+- Jira credentials (`JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`) if you want Jira-related workflows
 
 ## Quick start
 
@@ -10,7 +24,7 @@ Keep normal local setup in this one section:
 
 1. Run `make setup`.
 2. If OpenCode was just auto-installed, run `opencode`.
-3. Use `/connect` to configure a provider.
+3. Use `/connect` to configure a provider (GitHub Copilot recommended).
 4. Rerun `make setup`.
 
 ### This repo
@@ -18,9 +32,8 @@ Keep normal local setup in this one section:
 1. Edit the prompts in `prompts/` and agent settings in `config/` as needed.
 2. Set any needed environment variables for this repo.
 3. Run `make setup`.
-4. Reload or restart OpenCode.
-5. Start with `planner` (the current default agent).
-6. Ask `planner` to inspect the repo and propose a plan.
+4. Start with `planner` (the current default agent).
+5. Ask `planner` to inspect the repo and propose a plan.
 
 `make setup` is the normal setup entry point. It auto-installs `opencode` with Homebrew when available, then stops until you complete the interactive `opencode` `/connect` step and rerun it. It keeps `python3` as a hard blocker, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
 
@@ -86,8 +99,6 @@ The script:
 - updates `default_agent` in `~/.config/opencode/opencode.json`
 
 If `~/.config/opencode/opencode.json` already exists, the script preserves other settings and only updates `default_agent`.
-
-After syncing, reload OpenCode so the updated agents and custom tools are available.
 
 ## Jira tools
 
