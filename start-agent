@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import os
 from pathlib import Path
 
 from repo_update_check import (
@@ -22,9 +23,24 @@ from repo_update_check import (
 ROOT = Path(__file__).resolve().parent
 
 
+def launch_dir() -> Path:
+    requested = os.environ.get("OPENCODE_CWD", "").strip()
+    if not requested:
+        return ROOT
+
+    candidate = Path(requested).expanduser()
+    if candidate.is_dir():
+        return candidate.resolve()
+
+    raise ValueError(f"PROJECT_DIR is not a directory: {requested}")
+
+
 def launch_opencode() -> int:
     try:
-        return subprocess.run(["opencode"], cwd=ROOT).returncode
+        return subprocess.run(["opencode"], cwd=launch_dir()).returncode
+    except ValueError as exc:
+        print(f"❌ Error: {exc}")
+        return 1
     except FileNotFoundError:
         print("❌ Error: 'opencode' was not found on PATH.")
         print("ℹ️ Run 'make install-opencode', then 'make setup', and try 'make open' again.")

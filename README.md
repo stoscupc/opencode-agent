@@ -80,11 +80,11 @@ make setup
 
 After the one-time setup above:
 
-1. Open a terminal in the folder for the project you want to work on.
-2. Run `make open`.
+1. Open a terminal in this repo.
+2. Run `make open` to work in this repo, or run `make open PROJECT_DIR=/path/to/project` to open another project folder.
 3. Describe the work you want done, or paste a Jira ticket link.
 
-`make open` runs the repo-local `./start-agent` launcher. It checks whether this clone is behind `origin/main`, prompts you to update, and only auto-runs `git pull --ff-only origin main` when you are already on a clean local `main` branch and the update is fast-forward-safe. If those checks fail, it prints short manual update steps and still launches `opencode`.
+`make open` runs this repo's `Makefile` and repo-local `./start-agent` launcher, so run it from this repo clone. It checks whether this clone is behind `origin/main`, prompts you to update, and only auto-runs `git pull --ff-only origin main` when you are already on a clean local `main` branch and the update is fast-forward-safe. If those checks fail, it prints short manual update steps and still launches `opencode`. When `PROJECT_DIR` is provided, OpenCode opens that directory before starting; otherwise it opens the current directory for this repo-local invocation.
 
 `./sync-agent` also includes a non-blocking reminder when this clone is behind `origin/main`, which is useful during setup and repo-local iteration.
 
@@ -94,7 +94,7 @@ This is the normal working path after setup, not the one-time initial setup flow
 
 ```mermaid
 flowchart TD
-    A[Open target project folder] --> B[Run `make open`]
+    A[Open this repo in a terminal] --> B[Run `make open` or `make open PROJECT_DIR=/path/to/project`]
     B --> C[Describe work or paste Jira ticket]
     C --> D[Planner proposes plan]
     D --> E{Approve plan?}

@@ -1,5 +1,8 @@
 .PHONY: install-opencode open setup
 
+ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+OPEN_PROJECT_DIR := $(if $(strip $(PROJECT_DIR)),$(PROJECT_DIR),$(CURDIR))
+
 install-opencode:
 	@set -e; \
 	if ! command -v brew >/dev/null 2>&1; then \
@@ -22,7 +25,12 @@ install-opencode:
 	echo "ℹ️ Next: run 'opencode', use '/connect' once, then run 'make setup' and 'make open'."
 
 open:
-	@./start-agent
+	@set -e; \
+	if [ -n "$(strip $(PROJECT_DIR))" ] && [ ! -d "$(PROJECT_DIR)" ]; then \
+		echo "❌ Error: PROJECT_DIR is not a directory: $(PROJECT_DIR)"; \
+		exit 1; \
+	fi; \
+	OPENCODE_CWD="$(OPEN_PROJECT_DIR)" "$(ROOT_DIR)start-agent"
 
 setup:
 	@set -e; \
@@ -98,6 +106,6 @@ setup:
 	fi; \
 	./sync-agent; \
 	printf "\nNext steps:\n"; \
-	printf "1. cd to the folder where you want work done.\n"; \
-	printf "2. Run 'make open'.\n"; \
+	printf "1. Stay in this repo when launching OpenCode.\n"; \
+	printf "2. Run 'make open' for this repo, or 'make open PROJECT_DIR=/path/to/project' for another project.\n"; \
 	printf "3. Describe the work you want done, or paste a Jira ticket link.\n"
