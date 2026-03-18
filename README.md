@@ -81,8 +81,12 @@ make setup
 After the one-time setup above:
 
 1. Open a terminal in the folder for the project you want to work on.
-2. Run `opencode`.
+2. Run `make open`.
 3. Describe the work you want done, or paste a Jira ticket link.
+
+`make open` runs the repo-local `./start-agent` launcher. It checks whether this clone is behind `origin/main`, prompts you to update, and only auto-runs `git pull --ff-only origin main` when you are already on a clean local `main` branch and the update is fast-forward-safe. If those checks fail, it prints short manual update steps and still launches `opencode`.
+
+`./sync-agent` also includes a non-blocking reminder when this clone is behind `origin/main`, which is useful during setup and repo-local iteration.
 
 ## Default workflow
 
@@ -129,18 +133,18 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 - `sync-agent` - lower-level sync script used by `make setup` and by agent/tool authors
 - `examples/sample-task.md` - a small example prompt flow for sanity-checking the setup
 
-`src/` and `tests/` exist but are not the center of this skeleton today.
+This skeleton is centered on prompts, config, and helper scripts in this repo.
 
 ## Contributing to this repo
 
-Most users should complete the one-time setup above, then use `make setup` when needed. If you are contributing to this repo itself, a lightweight workflow is:
+Most users should complete the one-time setup above, then use `make setup` when needed and `make open` to launch OpenCode for this repo. If you are contributing to this repo itself, a lightweight workflow is:
 
 1. Create a branch.
 2. Make your changes.
-3. Run `./sync-agent`, then rerun `opencode` to test your changes.
+3. Run `./sync-agent`, then rerun `make open` to test your changes.
 4. Open a PR.
 
-`./sync-agent` is the lower-level sync step behind `make setup`. Use it directly when you are iterating on prompts, agent config, or files under `.opencode/tools/`.
+`./sync-agent` is the lower-level sync step behind `make setup`. Use it directly when you are iterating on prompts, agent config, or files under `.opencode/tools/`. It also prints a non-blocking reminder when this repo clone is behind `origin/main`.
 
 The script:
 

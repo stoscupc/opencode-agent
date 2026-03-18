@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import subprocess
+import sys
+from pathlib import Path
+
+from repo_update_check import (
+    GIT_COMMAND_TIMEOUT_SECONDS,
+    REMOTE_NAME,
+    REMOTE_BRANCH,
+    auto_update_blocker,
+    extract_error,
+    inspect_clone_status,
+    manual_update_instructions,
+    run_git,
+    summarize_git_message,
+)
+
+
+ROOT = Path(__file__).resolve().parent
+
+
+def launch_opencode() -> int:
+    try:
+        return subprocess.run(["opencode"], cwd=ROOT).returncode
+    except FileNotFoundError:
+        print("❌ Error: 'opencode' was not found on PATH.")
+        print("ℹ️ Run 'make install-opencode', then 'make setup', and try 'make open' again.")
+        return 1
+
+
+def prompt_yes_no(prompt: str) -> bool:
+    try:
+        reply = input(prompt).strip().lower()
+    except EOFError:
+        return False
+    return reply in {"y", "yes"}
+
+
+def print_manual_instructions(reason: str | None = None) -> None:
+    if reason:
+        print(f"ℹ️ Could not update automatically: {reason}.")
+    print("ℹ️ To update manually later, run:")
+    for step in manual_update_instructions():
+        print(f"   {step}")
+
+
+def maybe_update_before_launch() -> None:
+    status = inspect_clone_status(ROOT)
+
+    if not status.checked:
+        if status.error:
+            print(f"⚠️ Could not check whether this clone is behind origin/main: {status.error}")
+        return
+
+    if not status.is_behind:
+        return
+
+    print(f"⚠️ This clone is {status.behind_count} commit(s) behind origin/main.")
+    if not prompt_yes_no("Use the latest version now? [y/N] "):
+        print_manual_instructions()
+        return
+
+    blocker = auto_update_blocker(status)
+    if blocker:
+        print_manual_instructions(blocker)
+        return
+
+    try:
+        pull = run_git(
+            ROOT,
+            "pull",
+            "--ff-only",
+            REMOTE_NAME,
+            REMOTE_BRANCH,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        print(f"⚠️ Automatic update failed: {extract_error(exc)}")
+        print_manual_instructions()
+        return
+
+    if pull.returncode == 0:
+        print("✅ Updated to the latest origin/main.")
+        return
+
+    error = summarize_git_message(pull.stderr, pull.stdout, "git pull failed")
+    print(f"⚠️ Automatic update failed: {error}")
+    print_manual_instructions()
+
+
+def main() -> int:
+    maybe_update_before_launch()
+    return launch_opencode()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
