@@ -99,18 +99,18 @@ flowchart TD
     C --> D[Planner proposes plan]
     D --> E{Approve plan?}
     E -->|Request changes| D
-    E -->|Approve| F[Implementer/reviewer loop]
-    F --> G[Approved result]
-    G --> H{Next step?}
+    E -->|Approve| F[Implement approved changes]
+    F --> G[Review passes]
+    G --> H{Choose next step}
     H -->|Commit locally| P[Done]
     H -->|Commit + open/update PR| I[Reviewer comments arrive]
-    H -->|Request changes| F
+    H -->|Request changes| D
     I --> J[Planner evaluates comments]
-    J -->|Accepted / in scope| K[User approves follow-up plan]
-    K --> L[Implementer/reviewer follow-up]
-    L --> G
-    J -->|Out of scope| M[Create or suggest Jira follow-up work]
-    J -->|Rejected| N[No current PR code change]
+    J -->|Accepted / in scope| K[Approve follow-up plan]
+    K --> L[Implement follow-up changes]
+    L --> H
+    J -->|Out of scope| M[Jira follow-up]
+    J -->|Rejected| N[No PR change]
     M --> O[PR completed]
     N --> O
     O --> P
