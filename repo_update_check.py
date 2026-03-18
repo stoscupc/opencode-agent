@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,6 +9,21 @@ from pathlib import Path
 REMOTE_NAME = "origin"
 REMOTE_BRANCH = "main"
 REMOTE_REF = f"{REMOTE_NAME}/{REMOTE_BRANCH}"
+GIT_COMMAND_TIMEOUT_SECONDS = 10
+
+
+def git_env() -> dict[str, str]:
+    env = os.environ.copy()
+    env.update(
+        {
+            "GIT_TERMINAL_PROMPT": "0",
+            "GIT_ASKPASS": "/usr/bin/true",
+            "SSH_ASKPASS": "/usr/bin/true",
+            "SSH_ASKPASS_REQUIRE": "force",
+            "GCM_INTERACTIVE": "never",
+        }
+    )
+    return env
 
 
 @dataclass
@@ -42,6 +58,8 @@ def run_git(
         check=check,
         capture_output=True,
         text=True,
+        timeout=GIT_COMMAND_TIMEOUT_SECONDS,
+        env=git_env(),
     )
 
 
@@ -68,7 +86,11 @@ def inspect_clone_status(repo_root: Path) -> CloneStatus:
             ).returncode
             == 0
         )
-    except (subprocess.CalledProcessError, ValueError) as exc:
+    except (
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        ValueError,
+    ) as exc:
         return CloneStatus(checked=False, error=extract_error(exc))
 
     return CloneStatus(
@@ -82,13 +104,23 @@ def inspect_clone_status(repo_root: Path) -> CloneStatus:
 
 def extract_error(exc: Exception) -> str:
     if isinstance(exc, subprocess.CalledProcessError):
-        stderr = (exc.stderr or "").strip()
-        stdout = (exc.stdout or "").strip()
-        if stderr:
-            return stderr
-        if stdout:
-            return stdout
+        return summarize_git_message(exc.stderr, exc.stdout, "git command failed")
+    if isinstance(exc, subprocess.TimeoutExpired):
+        timeout_seconds = (
+            int(exc.timeout) if exc.timeout else GIT_COMMAND_TIMEOUT_SECONDS
+        )
+        return f"git command timed out after {timeout_seconds}s"
     return str(exc)
+
+
+def summarize_git_message(stderr: str | None, stdout: str | None, default: str) -> str:
+    message = (stderr or stdout or default).strip()
+    if not message:
+        return default
+    first_line = message.splitlines()[0].strip()
+    if len(first_line) <= 160:
+        return first_line
+    return first_line[:157] + "..."
 
 
 def auto_update_blocker(status: CloneStatus) -> str | None:

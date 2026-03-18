@@ -7,11 +7,15 @@ import sys
 from pathlib import Path
 
 from repo_update_check import (
+    GIT_COMMAND_TIMEOUT_SECONDS,
     REMOTE_NAME,
     REMOTE_BRANCH,
     auto_update_blocker,
+    extract_error,
     inspect_clone_status,
     manual_update_instructions,
+    run_git,
+    summarize_git_message,
 )
 
 
@@ -19,7 +23,12 @@ ROOT = Path(__file__).resolve().parent
 
 
 def launch_opencode() -> int:
-    return subprocess.run(["opencode"], cwd=ROOT).returncode
+    try:
+        return subprocess.run(["opencode"], cwd=ROOT).returncode
+    except FileNotFoundError:
+        print("❌ Error: 'opencode' was not found on PATH.")
+        print("ℹ️ Run 'make install-opencode', then 'make setup', and try 'make open' again.")
+        return 1
 
 
 def prompt_yes_no(prompt: str) -> bool:
@@ -59,17 +68,25 @@ def maybe_update_before_launch() -> None:
         print_manual_instructions(blocker)
         return
 
-    pull = subprocess.run(
-        ["git", "pull", "--ff-only", REMOTE_NAME, REMOTE_BRANCH],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-    )
+    try:
+        pull = run_git(
+            ROOT,
+            "pull",
+            "--ff-only",
+            REMOTE_NAME,
+            REMOTE_BRANCH,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        print(f"⚠️ Automatic update failed: {extract_error(exc)}")
+        print_manual_instructions()
+        return
+
     if pull.returncode == 0:
         print("✅ Updated to the latest origin/main.")
         return
 
-    error = (pull.stderr or pull.stdout or "git pull failed").strip()
+    error = summarize_git_message(pull.stderr, pull.stdout, "git pull failed")
     print(f"⚠️ Automatic update failed: {error}")
     print_manual_instructions()
 

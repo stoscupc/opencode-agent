@@ -19,7 +19,7 @@ install-opencode:
 		echo "ℹ️ Ensure Homebrew's bin directory is on PATH for this shell (for example, load your Homebrew shellenv settings)."; \
 		echo "ℹ️ If the formula is not linked yet, run 'brew link opencode'."; \
 	fi; \
-	echo "ℹ️ Next: run 'opencode', use '/connect' once, then run 'make setup'."
+	echo "ℹ️ Next: run 'opencode', use '/connect' once, then run 'make setup' and 'make open'."
 
 open:
 	@./start-agent

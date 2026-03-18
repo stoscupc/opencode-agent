@@ -133,7 +133,7 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 - `sync-agent` - lower-level sync script used by `make setup` and by agent/tool authors
 - `examples/sample-task.md` - a small example prompt flow for sanity-checking the setup
 
-`src/` and `tests/` exist but are not the center of this skeleton today.
+This skeleton is centered on prompts, config, and helper scripts in this repo.
 
 ## Contributing to this repo
 
