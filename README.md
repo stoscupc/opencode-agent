@@ -18,26 +18,18 @@ Before using this repo, make sure you have:
 
 ## Quick start
 
-Keep normal local setup in this one section:
-
 ### One-time OpenCode setup
 
 1. Run `make setup`.
-2. If OpenCode was just auto-installed, run `opencode`.
-3. Use `/connect` to configure a provider (GitHub Copilot recommended).
-4. Rerun `make setup`.
+2. If you have not already connected OpenCode to a provider, run `opencode`, then run `/connect` and configure a provider (GitHub Copilot recommended).
+3. Rerun `make setup`.
 
-### This repo
+### Start work in a project
 
-1. Edit the prompts in `prompts/` and agent settings in `config/` as needed.
-2. Set any needed environment variables for this repo.
-3. Run `make setup`.
-4. Start with `planner` (the current default agent).
-5. Ask `planner` to inspect the repo and propose a plan.
+1. Open a terminal in the folder for the project you want to work on.
+2. Run `opencode`.
 
-`make setup` is the normal setup entry point. It auto-installs `opencode` with Homebrew when available, then stops until you complete the interactive `opencode` `/connect` step and rerun it. It keeps `python3` as a hard blocker, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
-
-Use `./sync-agent` directly only for advanced/manual syncing when you are iterating on prompts, agent config, or files under `.opencode/tools/` and want that lower-level step by itself.
+`make setup` is the normal setup entry point. It auto-installs `opencode` with Homebrew when available, then stops until you complete the one-time interactive `opencode` `/connect` step and rerun it. It keeps `python3` as a hard blocker, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
 
 ## Default workflow
 
@@ -86,11 +78,16 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 
 `src/` and `tests/` exist but are not the center of this skeleton today.
 
-## Advanced: syncing agents and tools manually
+## Contributing to this repo
 
-Most users should use `make setup`.
+Most users should use `make setup`. If you are contributing to this repo itself, a lightweight workflow is:
 
-Run `./sync-agent` directly only when you are iterating on prompts, agent config, or files under `.opencode/tools/` and want the lower-level sync step by itself.
+1. Create a branch.
+2. Make your changes.
+3. Run `./sync-agent`.
+4. Open a PR.
+
+`./sync-agent` is the lower-level sync step behind `make setup`. Use it directly when you are iterating on prompts, agent config, or files under `.opencode/tools/`.
 
 The script:
 
