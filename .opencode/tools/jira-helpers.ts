@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs"
-import { dirname, join, parse } from "node:path"
+import { homedir } from "node:os"
+import { join } from "node:path"
 
 type EnvValues = Record<string, string>
 
@@ -35,22 +36,14 @@ function parseDotEnv(contents: string): EnvValues {
   return values
 }
 
-export function loadNearestDotEnv(startDir: string): EnvValues {
-  let currentDir = startDir
-  const { root } = parse(startDir)
+const GLOBAL_JIRA_ENV_PATH = join(homedir(), ".config", "opencode", "jira.env")
 
-  while (true) {
-    const envPath = join(currentDir, ".env")
-    if (existsSync(envPath)) {
-      return parseDotEnv(readFileSync(envPath, "utf8"))
-    }
-
-    if (currentDir === root) {
-      return {}
-    }
-
-    currentDir = dirname(currentDir)
+export function loadGlobalJiraEnv(): EnvValues {
+  if (!existsSync(GLOBAL_JIRA_ENV_PATH)) {
+    return {}
   }
+
+  return parseDotEnv(readFileSync(GLOBAL_JIRA_ENV_PATH, "utf8"))
 }
 
 export function requiredEnv(name: string, fallbackEnv: EnvValues): string {
@@ -68,7 +61,7 @@ export function requiredEnv(name: string, fallbackEnv: EnvValues): string {
   const value = fallbackEnv[name]?.trim()
   if (!value) {
     throw new Error(
-      `Missing required Jira environment variable: ${name}. Set it in process.env or in a .env file in the current working directory or one of its ancestors.`,
+      `Missing required Jira environment variable: ${name}. Set it in process.env or run 'make setup' to persist Jira credentials to ${GLOBAL_JIRA_ENV_PATH}.`,
     )
   }
 

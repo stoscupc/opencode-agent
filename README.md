@@ -9,27 +9,80 @@ It includes project-local integrations for:
 
 ## Prerequisites
 
-Before using this repo, make sure you have:
+Before normal use, complete these one-time setup steps:
 
-- OpenCode available on your machine, or Homebrew so `make setup` can install it for you
-- Python 3 on `PATH`
-- GitHub CLI (`gh`) installed and authenticated if you want PR-related workflows
-- Jira credentials (`JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`) if you want Jira-related workflows
+1. Make sure Python 3 is available:
+
+   ```sh
+   python3 --version
+   ```
+
+2. Install OpenCode:
+
+   ```sh
+   make install-opencode
+   ```
+
+   This Homebrew-based helper installs `opencode` separately from repo setup.
+
+3. Connect OpenCode to a provider once:
+
+   ```sh
+   opencode
+   ```
+
+   Then run `/connect` inside OpenCode and finish provider setup (GitHub Copilot recommended).
+
+4. Run the repo setup entry point:
+
+   ```sh
+   make setup
+   ```
+
+   `make setup` is the normal repo setup entry point after OpenCode is already installed and connected. It keeps `python3` as a hard blocker, fails clearly if `opencode` is missing, persists Jira credentials from your shell or this setup repo's local `.env` into `~/.config/opencode/jira.env` when available, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
+
+### One-time setup summary
+
+Run these commands in order:
+
+```sh
+python3 --version
+make install-opencode
+opencode
+# run /connect inside OpenCode once
+make setup
+```
+
+### Optional one-time setup for integrations
+
+- GitHub PR workflows:
+
+  ```sh
+  gh auth status
+  ```
+
+  If `gh` is not installed yet, install it first (for example with Homebrew: `brew install gh`), then run:
+
+  ```sh
+  gh auth login
+  gh auth status
+  ```
+
+- Jira workflows:
+
+  ```sh
+  cp .env.example .env
+  ```
+
+  Then set `JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN` in `.env` or in your shell environment, then run `make setup` to persist them to `~/.config/opencode/jira.env` for the Jira tools.
 
 ## Quick start
 
-### One-time OpenCode setup
-
-1. Run `make setup`.
-2. If you have not already connected OpenCode to a provider, run `opencode`, then run `/connect` and configure a provider (GitHub Copilot recommended).
-3. Rerun `make setup`.
-
-### Start work in a project
+After the one-time setup above:
 
 1. Open a terminal in the folder for the project you want to work on.
 2. Run `opencode`.
-
-`make setup` is the normal setup entry point. It auto-installs `opencode` with Homebrew when available, then stops until you complete the one-time interactive `opencode` `/connect` step and rerun it. It keeps `python3` as a hard blocker, warns if Jira environment variables are missing, prints non-blocking GitHub CLI install/auth guidance for PR-related workflows, and runs the lower-level sync step for you.
+3. Describe the work you want done, or paste a Jira ticket link.
 
 ## Default workflow
 
@@ -72,7 +125,7 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 - `config/agents.json` - agent manifest; currently sets `planner` as the default agent
 - `config/*.json` - per-agent metadata used by the sync script
 - `.opencode/tools/` - project-local custom tools for Jira and Git actions
-- `Makefile` - includes `make setup` for normal local repo setup
+- `Makefile` - includes `make install-opencode` and `make setup` for local setup
 - `sync-agent` - lower-level sync script used by `make setup` and by agent/tool authors
 - `examples/sample-task.md` - a small example prompt flow for sanity-checking the setup
 
@@ -80,11 +133,11 @@ In `## File-by-file review notes`, include changed line numbers or line ranges w
 
 ## Contributing to this repo
 
-Most users should use `make setup`. If you are contributing to this repo itself, a lightweight workflow is:
+Most users should complete the one-time setup above, then use `make setup` when needed. If you are contributing to this repo itself, a lightweight workflow is:
 
 1. Create a branch.
 2. Make your changes.
-3. Run `./sync-agent`.
+3. Run `./sync-agent`, then rerun `opencode` to test your changes.
 4. Open a PR.
 
 `./sync-agent` is the lower-level sync step behind `make setup`. Use it directly when you are iterating on prompts, agent config, or files under `.opencode/tools/`.
@@ -109,20 +162,20 @@ The repo's only declared dependency is `@opencode-ai/plugin`, which the custom t
 
 ### Jira environment variables
 
-Set these values using your normal environment-loading workflow before using the Jira tools:
+Set these values using your normal environment-loading workflow before running `make setup`:
 
 - `JIRA_BASE_URL` - for example `https://your-domain.atlassian.net`
 - `JIRA_EMAIL` - the email address used for Jira API-token auth
 - `JIRA_API_TOKEN` - the Jira API token paired with that email
 
-`.env.example` shows the expected variable names. A local `.env` file is also supported as a fallback by the Jira tools.
+`.env.example` shows the expected variable names. During `make setup`, this setup repo can read Jira values from your current shell first, then from this repo's local `.env`, and persist them to `~/.config/opencode/jira.env` for the Jira tools.
 
 When the Jira tools run, they:
 
 1. check `process.env` first
-2. fall back to the nearest ancestor `.env` file
+2. fall back to `~/.config/opencode/jira.env`
 
-Fallback is only for `.env` files, not `.env.local` or other variants. If a Jira variable is present in `process.env` but blank, the tool treats it as invalid and does not fall back to `.env` for that variable.
+If a Jira variable is present in `process.env` but blank, the tool treats it as invalid and does not fall back to the persisted Jira env file for that variable.
 
 ### Jira usage
 
