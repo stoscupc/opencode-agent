@@ -1,6 +1,6 @@
 import { tool, type ToolContext } from "@opencode-ai/plugin/tool"
 import {
-  loadNearestDotEnv,
+  loadGlobalJiraEnv,
   normalizeBaseUrl,
   requiredEnv,
   toToolText,
@@ -68,7 +68,7 @@ export default tool({
     },
     context: ToolContext,
   ) {
-    const fallbackEnv = loadNearestDotEnv(process.cwd())
+    const fallbackEnv = loadGlobalJiraEnv()
     const baseUrl = normalizeBaseUrl(requiredEnv("JIRA_BASE_URL", fallbackEnv))
     const email = requiredEnv("JIRA_EMAIL", fallbackEnv)
     const apiToken = requiredEnv("JIRA_API_TOKEN", fallbackEnv)
