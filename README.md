@@ -90,6 +90,32 @@ After the one-time setup above:
 
 ## Default workflow
 
+This is the normal working path after setup, not the one-time initial setup flow.
+
+```mermaid
+flowchart TD
+    A[Open target project folder] --> B[Run `make open`]
+    B --> C[Describe work or paste Jira ticket]
+    C --> D[Planner proposes plan]
+    D --> E{Approve plan?}
+    E -->|Request changes| D
+    E -->|Approve| F[Implement approved changes]
+    F --> G[Review passes]
+    G --> H{Choose next step}
+    H -->|Commit locally| P[Done]
+    H -->|Commit + open/update PR| I[Reviewer comments arrive]
+    H -->|Request changes| D
+    I --> J[Planner evaluates comments]
+    J -->|Accepted / in scope| K[Approve follow-up plan]
+    K --> L[Implement follow-up changes]
+    L --> H
+    J -->|Out of scope| M[Jira follow-up]
+    J -->|Rejected| N[No PR change]
+    M --> O[PR completed]
+    N --> O
+    O --> P
+```
+
 1. `planner` inspects the repo and proposes a plan.
 2. You approve the plan.
 3. If Jira issue key(s) were part of that approved work, `planner` updates all provided Jira issues to `In Progress` before implementation starts.
