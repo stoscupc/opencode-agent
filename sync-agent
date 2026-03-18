@@ -35,6 +35,11 @@ def load_text(path: Path) -> str:
     return path.read_text(encoding="utf-8").strip() + "\n"
 
 
+def resolve_manifest_path(path_str: str) -> Path:
+    path = Path(path_str).expanduser()
+    return path if path.is_absolute() else ROOT / path
+
+
 def strip_jsonc(text: str) -> str:
     result = []
     in_string = False
@@ -188,8 +193,8 @@ def load_agent_specs() -> tuple[list[dict], str]:
             if not config_file or not prompt_file:
                 raise ValueError("Each agent entry must include 'config_file' and 'prompt_file'")
 
-            config_path = Path(config_file).expanduser()
-            prompt_path = Path(prompt_file).expanduser()
+            config_path = resolve_manifest_path(config_file)
+            prompt_path = resolve_manifest_path(prompt_file)
             config = load_json_file(config_path)
             prompt_text = load_text(prompt_path)
             agent_id = config.get("id")
