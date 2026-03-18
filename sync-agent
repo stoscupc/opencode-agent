@@ -6,6 +6,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from repo_update_check import inspect_clone_status
+
 
 ROOT = Path(__file__).resolve().parent
 AGENTS_MANIFEST_PATH = ROOT / "config" / "agents.json"
@@ -256,7 +258,24 @@ def sync_custom_tools() -> list[Path]:
     return synced_paths
 
 
+def maybe_warn_if_behind() -> None:
+    status = inspect_clone_status(ROOT)
+
+    if not status.checked:
+        if status.error:
+            print(f"⚠️ Could not check whether this clone is behind origin/main: {status.error}")
+        return
+
+    if not status.is_behind:
+        return
+
+    print(f"⚠️ This clone is {status.behind_count} commit(s) behind origin/main.")
+    print("ℹ️ Run 'make open' for an interactive update check before launching OpenCode.")
+
+
 def main() -> int:
+    maybe_warn_if_behind()
+
     try:
         agent_specs, default_agent = load_agent_specs()
     except FileNotFoundError as exc:

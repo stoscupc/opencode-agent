@@ -1,4 +1,4 @@
-.PHONY: install-opencode setup
+.PHONY: install-opencode open setup
 
 install-opencode:
 	@set -e; \
@@ -20,6 +20,9 @@ install-opencode:
 		echo "ℹ️ If the formula is not linked yet, run 'brew link opencode'."; \
 	fi; \
 	echo "ℹ️ Next: run 'opencode', use '/connect' once, then run 'make setup'."
+
+open:
+	@./start-agent
 
 setup:
 	@set -e; \
@@ -96,5 +99,5 @@ setup:
 	./sync-agent; \
 	printf "\nNext steps:\n"; \
 	printf "1. cd to the folder where you want work done.\n"; \
-	printf "2. Run 'opencode'.\n"; \
+	printf "2. Run 'make open'.\n"; \
 	printf "3. Describe the work you want done, or paste a Jira ticket link.\n"
