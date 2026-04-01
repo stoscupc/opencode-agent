@@ -1,5 +1,7 @@
 # OpenCode Multi-Agent Skeleton
 
+> **Deprecated:** This project is deprecated. Active work has moved to [hashicorp/fulcrum](https://github.com/hashicorp/fulcrum), and you should use that repository instead.
+
 This repo is a prompt-first skeleton for running OpenCode in a lightweight development workflow. It syncs project-local prompts, agent config, and tools into your OpenCode setup so you can use `planner`, `implementer`, and `reviewer` to plan work, implement approved changes, review them, and then optionally handle Jira and GitHub follow-up tasks.
 
 It includes project-local integrations for:
